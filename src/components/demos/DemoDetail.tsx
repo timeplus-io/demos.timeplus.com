@@ -45,21 +45,21 @@ const DemoDetail: React.FC<DemoDetailProps> = ({ demo, onBack }) => {
         </div>
     
     <div className="mb-8">
-      <h2 className="text-2xl font-bold text-white mb-4">Overview</h2>
+      <h2 className="text-2xl font-bold text-white mb-4">Introduction</h2>
       <div className="text-timeplus-gray-100 prose prose-invert max-w-none">
         <ReactMarkdown>{demo.description}</ReactMarkdown>
       </div>
     </div>
         
         <div className="mb-8">
-          <h2 className="text-2xl font-bold text-white mb-4">Problem Statement</h2>
+          <h2 className="text-2xl font-bold text-white mb-4">Challenges</h2>
           <div className="text-timeplus-gray-100 prose prose-invert max-w-none">
             <ReactMarkdown>{demo.problemStatement}</ReactMarkdown>
           </div>
         </div>
         
         <div className="mb-8">
-          <h2 className="text-2xl font-bold text-white mb-4">Context</h2>
+          <h2 className="text-2xl font-bold text-white mb-4">Timeplus Solution</h2>
           <div className="text-timeplus-gray-100 prose prose-invert max-w-none">
             <ReactMarkdown>
               {demo.context}
