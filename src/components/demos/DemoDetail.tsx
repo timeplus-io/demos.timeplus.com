@@ -1,7 +1,7 @@
 import React from "react";
 import ReactMarkdown from "react-markdown";
 import SyntaxHighlighter from "react-syntax-highlighter";
-import { docco } from "react-syntax-highlighter/dist/esm/styles/hljs"; // Choose a theme
+import { pojoaque } from "react-syntax-highlighter/dist/esm/styles/hljs"; // Choose a theme
 import { Demo } from "../../data/demos";
 
 interface DemoDetailProps {
@@ -102,7 +102,7 @@ inline-block"
           <div className="bg-timeplus-gray-200 rounded-lg overflow-x-auto text-sm">
             <SyntaxHighlighter
               language="sql"
-              style={docco}
+              style={pojoaque}
               showLineNumbers
               wrapLines={true}
               className="text-timeplus-gray-50"
