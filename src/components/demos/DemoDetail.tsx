@@ -1,5 +1,7 @@
 import React from "react";
 import ReactMarkdown from "react-markdown";
+import SyntaxHighlighter from "react-syntax-highlighter";
+import { docco } from "react-syntax-highlighter/dist/esm/styles/hljs"; // Choose a theme
 import { Demo } from "../../data/demos";
 
 interface DemoDetailProps {
@@ -97,13 +99,16 @@ inline-block"
 
         <div className="mb-8">
           <h2 className="text-2xl font-bold text-white mb-4">SQL Example</h2>
-          <div
-            className="bg-timeplus-gray-200 p-4 rounded-lg overflow-x-auto text-sm font-mono
-text-timeplus-gray-50"
-          >
-            <pre className="whitespace-pre-wrap">
-              <code>{demo.sqlExample}</code>
-            </pre>
+          <div className="bg-timeplus-gray-200 rounded-lg overflow-x-auto text-sm">
+            <SyntaxHighlighter
+              language="sql"
+              style={docco}
+              showLineNumbers
+              wrapLines={true}
+              className="text-timeplus-gray-50"
+            >
+              {demo.sqlExample}
+            </SyntaxHighlighter>
           </div>
         </div>
 
