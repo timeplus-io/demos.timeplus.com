@@ -6,8 +6,8 @@ const Header: React.FC = () => {
       <div className="container mx-auto px-4 py-6 flex flex-col md:flex-row items-center justify-between">
         <div className="flex items-center mb-4 md:mb-0">
           <div className="mr-3">
-            <div className="h-10 w-10 rounded-md bg-timeplus-gradient flex items-center justify-center">
-              <span className="text-white font-bold text-xl">T+</span>
+            <div className="h-10 w-10 rounded-md flex items-center justify-center">
+              <img src="/src/assets/images/timeplus_logo.svg" alt="Timeplus Logo" className="h-8 w-8" />
             </div>
           </div>
           <h1 className="text-white text-2xl font-bold">Timeplus Demos</h1>
@@ -17,7 +17,7 @@ const Header: React.FC = () => {
           <a href="https://timeplus.com" className="text-timeplus-gray-100 hover:text-white transition-colors">
             Main Site
           </a>
-          <a href="https://timeplus.com/docs" className="text-timeplus-gray-100 hover:text-white transition-colors">
+          <a href="https://docs.timeplus.com" className="text-timeplus-gray-100 hover:text-white transition-colors">
             Documentation
           </a>
           <a 
