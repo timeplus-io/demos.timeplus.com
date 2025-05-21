@@ -8,7 +8,7 @@ const Header: React.FC = () => {
           <div className="mr-3">
             <div className="h-10 w-10 rounded-md flex items-center justify-center">
               <img
-                src="/timeplus_logo.svg"
+                src="timeplus_logo.svg"
                 alt="Timeplus Logo"
                 className="h-8 w-8"
               />

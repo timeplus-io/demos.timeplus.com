@@ -27,7 +27,7 @@ export const demos: Demo[] = [
       "Denormalize N+1 records in MySQL to a JSON doc, and Save in S3/GCS",
     category: "Pipeline",
     keywords: ["cdc", "debezium", "kafka", "pipeline", "s3", "oltp", "olap"],
-    coverImage: "/cdc_cover.png",
+    coverImage: "cdc_cover.png",
     introduction: `It's common to design your OLTP database schema in the normalized way. For example, when a customer places an order with multiple line items, one row will be added to the "orders" MySQL table with a "orderNumber", and multiple rows to add in the "order_details" table with the same "orderNumber".
 
 The goal is to create a JSON document for each order, with all line items aggregated, with the subtotal calculated, so that BigQuery can run SQL for those JSON files in GCS and no need to perform expensive JOINs.`,
@@ -51,7 +51,7 @@ The goal is to create a JSON document for each order, with all line items aggreg
       "Create a Materialized View to apply range join to enrich each order_details message with the order event, then apply tumble window join to aggregate line items for same order and send to S3/GCS ",
       "Optionally, you can set up BigQuery to scan the JSON files in GCS or use Looker to visualize them",
     ],
-    dataFlowImage: "/cdc_data_flow.png",
+    dataFlowImage: "cdc_data_flow.png",
     sqlExample: `create external stream retailer_etl.topic_orders(raw string)
 settings type='kafka', brokers='10.138.0.23:9092',topic='demo.cdc.mysql.retailer.orders';
 
