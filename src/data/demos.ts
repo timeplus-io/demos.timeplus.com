@@ -27,7 +27,7 @@ export const demos: Demo[] = [
       "Denormalize N+1 records in MySQL to a JSON doc, and Save in S3/GCS",
     category: "Pipeline",
     keywords: ["cdc", "debezium", "kafka", "pipeline", "s3", "oltp", "olap"],
-    coverImage: "/cdc.jpg",
+    coverImage: "/src/assets/images/cdc_cover.png",
     introduction: `It's common to design your OLTP database schema in the normalized way. For example, when a customer places an order with multiple line items, one row will be added to the "orders" MySQL table with a "orderNumber", and multiple rows to add in the "order_details" table with the same "orderNumber".
 
 The goal is to create a JSON document for each order, with all line items aggregated, with the subtotal calculated, so that BigQuery can run SQL for those JSON files in GCS and no need to perform expensive JOINs.`,
@@ -51,29 +51,58 @@ The goal is to create a JSON document for each order, with all line items aggreg
       "Create a Materialized View to apply range join to enrich each order_details message with the order event, then apply tumble window join to aggregate line items for same order and send to S3/GCS ",
       "Optionally, you can set up BigQuery to scan the JSON files in GCS or use Looker to visualize them",
     ],
-    dataFlowImage: "/oltp-to-olap-flow.jpg",
-    sqlExample: `create materialized view retailer_etl.mv_mysql_gcs_pipeline
-    into retailer_etl.gcs as
-    with
-    details as (select _tp_time, * from retailer_etl.mv_orderdetails settings seek_to='earliest'),
-    orders as (select _tp_time, * from retailer_etl.mv_orders settings seek_to='earliest'),
-    enriched_orderdetails as (
-      select orders._tp_time as timestamp,*
-      from details inner join orders
-      on (details.orderNumber = orders.orderNumber)
-      and date_diff_within(10s)--assume N+1 rows added within 10 seconds
-      settings join_max_buffered_bytes = 1048576000
-      )
-    select
-    orderNumber,any(customerNumber) as customerNumber,any(orderDate) as orderDate,any(status) as status,
-    sum(priceEach*quantityOrdered)::decimal(10,2) as orderTotal,
-    count() as itemCount,
-    group_uniq_array(productCode) as productCodes,
-    group_uniq_array(dict_get('retailer_etl.dict_products','productName',productCode)) as productNames,
-    group_uniq_array(dict_get('retailer_etl.dict_products','productLine',productCode)) as productLines
-    from tumble(enriched_orderdetails,timestamp,30s)
-    group by window_start,orderNumber
-    comment 'Combine details for same order & create JSON in GCS, batch every 30s';`,
+    dataFlowImage: "/src/assets/images/cdc_data_flow.png",
+    sqlExample: `create external stream retailer_etl.topic_orders(raw string)
+settings type='kafka', brokers='10.138.0.23:9092',topic='demo.cdc.mysql.retailer.orders';
+
+create materialized view orders as
+select _tp_time
+, to_uint32_or_zero(raw:after.orderNumber) as orderNumber
+, to_int16_or_zero(raw:after.orderDate) as orderDate
+, to_int16_or_zero(raw:after.requiredDate) as requiredDate
+, to_int16_or_zero(raw:after.shippedDate) as shippedDate
+, raw:after.status as status
+, raw:after.comments as comments
+, raw:after.customerNumber::int16 as customerNumber
+from retailer_etl.topic_orders settings seek_to='earliest';
+
+create external stream retailer_etl.topic_orderdetails(raw string)
+settings type='kafka', brokers='10.138.0.23:9092',topic='demo.cdc.mysql.retailer.orderdetails';
+
+create materialized view details as ..
+
+create external table retailer_etl.gcs(
+  orderNumber uint32,
+  customerNumber int16,
+  orderDate int16,
+  status string,
+  orderTotal decimal(10,2),
+  itemCount uint64,
+  productCodes array(string)
+)
+SETTINGS type='s3',
+  endpoint = 'https://storage.googleapis.com/timeplus-demo',
+  access_key_id = '..', --HMAC access ID
+  secret_access_key = '..', --HMAC secret key
+  data_format='JSONEachRow',
+  write_to = 'retailer_cdc/orders.jsonl',
+  s3_min_upload_file_size=1024, --default 500MB, use 1KB for demo
+  s3_max_upload_idle_seconds=60; --flush data after 1m
+
+create materialized view pipeline into gcs as
+with enriched_orderdetails as (
+  select orders._tp_time as timestamp,*
+  from details inner join orders
+  on (details.orderNumber = orders.orderNumber)
+  and date_diff_within(10s)
+)
+select orderNumber,any(customerNumber) as customerNumber,
+        any(orderDate) as orderDate,any(status) as status,
+        sum(priceEach*quantityOrdered)::decimal(10,2) as orderTotal,
+        count( ) as itemCount,
+        group_uniq_array(productCode) as productCodes
+from tumble(enriched_orderdetails,timestamp,30s)
+group by window_start,orderNumber;`,
     youtubeVideoLink:
       "https://www.youtube.com/embed/lTzSm2pMs-E?si=7NR8qbqq7m383OSS",
     demoLinks: [
