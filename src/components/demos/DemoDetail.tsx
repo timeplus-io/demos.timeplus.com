@@ -1,5 +1,6 @@
 import React from "react";
 import ReactMarkdown from "react-markdown";
+import mermaid from "mermaid";
 import SyntaxHighlighter from "react-syntax-highlighter";
 import { pojoaque } from "react-syntax-highlighter/dist/esm/styles/hljs"; // Choose a theme
 import { Demo } from "../../data/demos";
@@ -9,7 +10,20 @@ interface DemoDetailProps {
   onBack: () => void;
 }
 
+// Initialize Mermaid.js v11
+mermaid.initialize({
+  startOnLoad: false,
+  theme: "dark",
+  securityLevel: "loose",
+});
+
 const DemoDetail: React.FC<DemoDetailProps> = ({ demo, onBack }) => {
+  React.useEffect(() => {
+    mermaid.init(
+      undefined,
+      document.querySelectorAll('.mermaid:not([data-processed="true"])'),
+    );
+  }, [demo.dataFlowMarkdown]);
   return (
     <div className="bg-timeplus-gray-300 rounded-lg overflow-hidden">
       <div className="relative h-64 md:h-80 overflow-hidden">
@@ -95,12 +109,29 @@ inline-block"
 
         <div className="mb-8">
           <h2 className="text-2xl font-bold text-white mb-4">Data Flow</h2>
-          <div className="w-full max-h-96 overflow-hidden rounded-lg">
-            <img
-              src={demo.dataFlowImage}
-              alt={`${demo.title} Data Flow`}
-              className="w-full h-auto object-contain"
-            />
+          <div className="w-full max-h-196 overflow-hidden rounded-lg bg-timeplus-gray-200">
+            {demo.dataFlowImage ? (
+              <img
+                src={demo.dataFlowImage}
+                alt={`${demo.title} Data Flow`}
+                className="w-full h-auto object-contain"
+              />
+            ) : demo.dataFlowMarkdown ? (
+              <div
+                className="mermaid p-4"
+                style={{
+                  backgroundColor: "#2D3748",
+                  color: "white",
+                  overflow: "auto",
+                }}
+              >
+                {demo.dataFlowMarkdown}
+              </div>
+            ) : (
+              <p className="text-timeplus-gray-100 p-4">
+                No data flow visualization available.
+              </p>
+            )}
           </div>
         </div>
 
@@ -147,7 +178,14 @@ inline-block"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="block p-4 rounded-lg bg-timeplus-gray-200 hover:bg-timeplus-gray-100 transition-colors"
-                style={{ backgroundColor: '#2D3748' }} onMouseOver={(e) => e.currentTarget.style.backgroundColor = '#4A5568'} onMouseOut={(e) => e.currentTarget.style.backgroundColor = '#2D3748'}>
+                style={{ backgroundColor: "#2D3748" }}
+                onMouseOver={(e) =>
+                  (e.currentTarget.style.backgroundColor = "#4A5568")
+                }
+                onMouseOut={(e) =>
+                  (e.currentTarget.style.backgroundColor = "#2D3748")
+                }
+              >
                 <h3 className="text-lg font-bold text-white mb-2">
                   {link.title}
                 </h3>

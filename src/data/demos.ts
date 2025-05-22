@@ -9,7 +9,8 @@ export interface Demo {
   challenges: string;
   solution: string;
   steps: string[];
-  dataFlowImage: string;
+  dataFlowImage?: string; // Made optional
+  dataFlowMarkdown?: string; // Added for Mermaid.js content
   sqlExample: string;
   youtubeVideoLink?: string;
   demoLinks: {
@@ -145,7 +146,12 @@ You can install OpenTelemetry collectors on Linux and export data as JSON docume
       "Install plugin in Grafana to run streaming SQL for Timeplus and build dashboards",
       "Forward the logs and metrics to Splunk, OpenSearch and other systems",
     ],
-    dataFlowImage: "/observability-flow.jpg",
+    dataFlowMarkdown: `graph TD;
+        A[Linux with OpenTelemetry Collector]-->K[Apache Kafka];
+        K-->Timeplus-->Splunk;
+        Timeplus-->OpenSearch;
+        Grafana-->Timeplus;
+`,
     sqlExample: `create external stream o11y.otlp_metrics (raw string)
 settings type='kafka', brokers='10.138.0.23:9092',topic='otlp_metrics';
 
