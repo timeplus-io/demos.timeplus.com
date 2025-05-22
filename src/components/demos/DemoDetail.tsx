@@ -13,7 +13,7 @@ const DemoDetail: React.FC<DemoDetailProps> = ({ demo, onBack }) => {
   return (
     <div className="bg-timeplus-gray-300 rounded-lg overflow-hidden">
       <div className="relative h-64 md:h-80 overflow-hidden">
-        <img
+        <img style={{ position: 'absolute', right: 0, width: '50%' }}
           src={demo.coverImage}
           alt={`${demo.title} cover`}
           className="h-full object-cover"
