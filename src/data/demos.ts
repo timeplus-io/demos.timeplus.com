@@ -204,4 +204,83 @@ as select raw as event from o11y.otlp_metrics;
       },
     ],
   },
+  {
+    id: "ksql_alternative",
+    title: "ksqlDB Alternative",
+    subtitle: "Timeplus offers additional benefits compared to ksqlDB.",
+    category: "Stream Processing",
+    keywords: ["kafka", "sql", "database"],
+    coverImage: "ksql_cover.png",
+    introduction: `[ksqlDB](https://www.confluent.io/product/ksqldb/) is a stream processing engine designed specifically to read data from Apache Kafka topics, create stateless/stateful transformations, and write them back to Apache Kafka. Data then has to be landed in other dedicated downstream systems for rich query capability. It was renamed from KSQL to ksqlDB with limited capabilities to query some of the derived state from stream processing functions. These “ad-hoc” queries are limited to quick lookups via primary key equality or range queries..`,
+    challenges: `1️⃣ Limited Query and Join Capabilities: ksqlDB does not have the capability to answer any ad-hoc queries as a database or data warehouse would. It can only do certain key based lookups or range lookups. The data can also be joined in very limited ways based on primary key lookups.
+
+2️⃣ The performance of ksqlDB can be impacted by the time needed to serialize and deserialize data between Apache Kafka and RocksDB. The strong coupling to Kafka also has a big impact on performance: frequent data publication and retrieval from Kafka can increase latency and costs.
+
+
+3️⃣ ksqlDB state stores are notoriously difficult to maintain due to limitations in TTL management and other storage configurations. State stores are backed in Apache Kafka and thus require way more storage and network bandwidth overall for high availability and resilience.`,
+    solution:
+      "Timeplus is designed from the ground up in C++ based on database technology (Clickhouse in this case) but extended for Stream Processing. It leverages Clickhouse libraries and data structures under the hood in its process for extremely fast database operations such as filtering, projection, and aggregations.\n\n&nbsp;\n\nFor stream processing, it has created a native stream data structure as a first class citizen which does not require any coupling  with Apache Kafka although it can integrate with it if required. This allows for a much simpler and more performant system for data ingestion, processing and analytics all in one single binary. Data products created within Timeplus can be pushed out to external systems via Streaming or or consumed via Ad-hoc querying. As such it can easily integrate into the wider ecosystem of systems that integrate with Apache Kafka or Database/BI Tools.",
+    steps: [
+      "Install OpenTelemetry Collector on Linux machines",
+      "Configure the collector to send cpu/memory/disk metrics to Kafka",
+      "Create External Stream in Timeplus to read data from Kafka",
+      "Parse and filter the complex JSON message in Timeplus with JSON Path",
+      "Visualize the live metrics in Timeplus built-in dashboards",
+      "Install plugin in Grafana to run streaming SQL for Timeplus and build dashboards",
+      "Forward the logs and metrics to Splunk, OpenSearch and other systems",
+    ],
+    dataFlowMarkdown: `graph TD;
+        A[Apache Kafka Topic]-->T[Timeplus External Stream];
+        P[Apache Pulsar Topic]-->T;
+        T-->ClickHouse;
+        T-->B[Other Kafka/Pulsar Topics];
+`,
+    sqlExample: `create external stream frontend_events (
+    version int,
+    requestedUrl string,
+    method string,
+    correlationId string,
+    ipAddress string,
+    requestDuration int,
+    response map(string, int),
+    headers map(string, string)
+)
+SETTINGS
+type = 'kafka',
+brokers = 'kafka.demo-internal:9092',
+topic = 'owlshop-frontend-events';
+
+-- self JOIN, which is not available in ksqlDB
+SELECT
+  c.cid, c.latitude, c.longitude, c.speed_kmh, b.bid
+FROM
+  car_live_data AS c
+INNER JOIN bookings AS b ON c.cid = b.cid;
+
+-- ASOF JOIN is not supported in ksqlDB
+SELECT
+  c.cid, c.latitude, c.longitude, c.speed_kmh, b.bid
+FROM
+  car_live_data AS c
+ASOF JOIN bookings AS b ON (c.cid = b.cid)
+AND to_time(c.time) >= to_time(b.time);
+    `,
+    demoLinks: [
+      {
+        title: "Live Demo in Timeplus",
+        url: "https://demo.timeplus.cloud/ksql-alt/console/",
+        description: "Login with SSO, choose ksql demo workspace",
+      },
+      {
+        title: "Kafka UI",
+        url: "http://kafka.demo.timeplus.com:8080/topics/otlp_metrics",
+        description: "View raw JSON message in otlp_metrics Kafka topic",
+      },
+      {
+        title: "Comparing Timeplus and ksqlDB",
+        url: "https://www.timeplus.com/timeplus-vs-ksqldb",
+        description: "White paper to compare those 2 products",
+      },
+    ],
+  },
 ];
