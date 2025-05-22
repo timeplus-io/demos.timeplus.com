@@ -147,7 +147,7 @@ inline-block"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="block p-4 rounded-lg bg-timeplus-gray-200 hover:bg-timeplus-gray-100 transition-colors"
-              >
+                style={{ backgroundColor: '#2D3748' }} onMouseOver={(e) => e.currentTarget.style.backgroundColor = '#4A5568'} onMouseOut={(e) => e.currentTarget.style.backgroundColor = '#2D3748'}>
                 <h3 className="text-lg font-bold text-white mb-2">
                   {link.title}
                 </h3>
