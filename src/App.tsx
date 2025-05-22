@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import {
-  BrowserRouter,
+  HashRouter,
   Routes,
   Route,
   useParams,
@@ -33,12 +33,12 @@ const App: React.FC = () => {
   const categories = Array.from(new Set(demos.map((demo) => demo.category)));
 
   const handleDemoClick = (id: string) => {
-    window.location.href = `/${id}`;
+    window.location.href = `/#${id}`;
     window.scrollTo(0, 0);
   };
 
   return (
-    <BrowserRouter>
+    <HashRouter>
       <div className="flex flex-col min-h-screen bg-timeplus-gray-400 text-white">
         <Header />
 
@@ -105,7 +105,7 @@ const App: React.FC = () => {
 
         <Footer />
       </div>
-    </BrowserRouter>
+    </HashRouter>
   );
 };
 
