@@ -12,17 +12,17 @@ const DemoCard: React.FC<DemoCardProps> = ({ demo, onClick }) => {
       className="group cursor-pointer rounded-lg overflow-hidden bg-timeplus-gray-300 border border-timeplus-gray-200 hover:shadow-lg transition-all duration-300"
       onClick={() => onClick(demo.id)}
     >
+      <div className="relative">
+        <span className="absolute top-0 left-3 px-3 py-1 text-xs font-medium rounded-full bg-timeplus-gradient text-white z-10">
+          {demo.category}
+        </span>
+      </div>
       <div className="relative h-48 overflow-hidden">
         <img 
           src={demo.coverImage} 
           alt={`${demo.title} cover`} 
-          className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+          className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105 mt-4"
         />
-        <div className="absolute top-3 left-3">
-          <span className="px-3 py-1 text-xs font-medium rounded-full bg-timeplus-gradient text-white">
-            {demo.category}
-          </span>
-        </div>
       </div>
       
       <div className="p-5">
