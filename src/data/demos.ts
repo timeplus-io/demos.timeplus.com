@@ -21,10 +21,10 @@ export interface Demo {
 
 export const demos: Demo[] = [
   {
-    id: "demo-1",
+    id: "cdc",
     title: "OLTP to OLAP Pipeline",
     subtitle:
-      "Denormalize N+1 records in MySQL to a JSON doc, and Save in S3/GCS",
+      "Denormalize N+1 records in MySQL to a JSON doc, and Save in S3/GCS.",
     category: "Pipeline",
     keywords: ["cdc", "debezium", "kafka", "pipeline", "s3", "oltp", "olap"],
     coverImage: "cdc_cover.png",
@@ -120,38 +120,61 @@ group by window_start,orderNumber;`,
     ],
   },
   {
-    id: "demo-2",
+    id: "opentelemetry",
     title: "OpenTelemetry + SQL",
     subtitle:
-      "Collect logs, metrics and tracing via OpenTelemetry, export to Kafka, filter and aggregated by streaming SQL and build dashboards in Timeplus or Grafana",
+      "Collect logs, metrics and tracing via OpenTelemetry, export to Kafka, filter and aggregated by streaming SQL and build dashboards in Timeplus or Grafana.",
     category: "Observability",
     keywords: ["kafka", "opentelemetry", "grafana", "sql"],
-    coverImage: "/anomaly-detection.jpg",
-    introduction:
-      "A powerful observability solution combining OpenTelemetry with streaming SQL.\nKey features include:\n- Comprehensive data collection\n- Real-time filtering and aggregation\n- Flexible visualization options",
-    challenges:
-      "Modern distributed systems generate vast amounts of observability data including logs, metrics, and traces.\nKey challenges include:\n- Data silos across different tools\n- Complexity in correlating different data types\n- Delays in identifying and resolving issues\nThis results in slower incident response and reduced system reliability.",
+    coverImage: "/otlp_cover.png",
+    introduction: `[OpenTelemetry](https://opentelemetry.io/) is a collection of APIs, SDKs, and tools. Use it to instrument, generate, collect, and export telemetry data (metrics, logs, and traces) to help you analyze your software’s performance and behavior.
+You can install OpenTelemetry collectors on Linux and export data as JSON documents in Kafka topics and have Timeplus to run streaming ETL, routing, alerts and visualization.`,
+    challenges: `1️⃣ While the OpenTelemetry schema is open and flexible, the exported JSON documents are usually with thousands of lines per messages, with nested structure. Parsing and filtering such complex JSON documents are not easy and error-prone.
+
+2️⃣ Storing such complex JSON documents on Kafka and OLAP data warehouse lead to high cost of storage and computing
+
+3️⃣ Metrics and logs across different machines are usually collated to understand the big picture or troubleshot issues. JOIN data across mulitiple data sources and ID is usually a challenge in Grafana, Splunk and other platforms. Timestamps for those collated events are close but not exactly same.`,
     solution:
-      "This demo shows how Timeplus integrates with OpenTelemetry to provide a unified observability platform.\nBy collecting data via OpenTelemetry standards and exporting to Kafka, we enable:\n- Real-time processing with streaming SQL\n- Custom filtering and aggregation\n- Visualization through Timeplus dashboards or integration with Grafana\nThis provides teams with immediate insights into system health and performance.",
+      "This demo shows how Timeplus integrates with OpenTelemetry to provide a unified observability platform. Logs, metrics and tracing can be collected via open-source or 3rd party OpenTelemetry collector agents and pushed to Timeplus directly or via Kafka. \n\nTimeplus provides real-time processing with streaming SQL and custom filtering and aggregation, as well as built-in alerts and live visualization. By integrating with Grafana, Splunk, OpenSearch and other systems, Timeplus enables DevOps teams with immediate insights into system health and performance.",
     steps: [
-      "Ingest streaming sensor data from IoT devices",
-      "Apply anomaly detection algorithms in real-time",
-      "Visualize normal vs. anomalous patterns",
-      "Configure alerts for detected anomalies",
+      "Install OpenTelemetry Collector on Linux machines",
+      "Configure the collector to send cpu/memory/disk metrics to Kafka",
+      "Create External Stream in Timeplus to read data from Kafka",
+      "Parse and filter the complex JSON message in Timeplus with JSON Path",
+      "Visualize the live metrics in Timeplus built-in dashboards",
+      "Install plugin in Grafana to run streaming SQL for Timeplus and build dashboards",
+      "Forward the logs and metrics to Splunk, OpenSearch and other systems",
     ],
     dataFlowImage: "/observability-flow.jpg",
-    sqlExample: "..",
+    sqlExample: `create external stream o11y.otlp_metrics (raw string)
+settings type='kafka', brokers='10.138.0.23:9092',topic='otlp_metrics';
+
+-- get average CPU load every minute per instance
+select * except (rm,sm,metrics) from(
+  select _tp_time, array_join(raw:resourceMetrics[*]) as rm
+,(rm:resource.attributes[*][1]):value.stringValue as instance,rm:scopeMetrics[*][1] as sm,
+replace_regex(sm:scope.name,'.*scraper/(.*)','\\1') as scope_name
+,array_join(sm:metrics[*]) as metrics,metrics:description as metrics_desc
+,(metrics:gauge.dataPoints[*][1]):asDouble::double as metrics_value
+from o11y.otlp_metrics where scope_name='loadscraper' and metrics_desc='Average CPU Load over 1 minute.' settings seek_to='-1h'
+);
+    `,
     youtubeVideoLink: "https://www.youtube.com/embed/example2",
     demoLinks: [
       {
-        title: "Anomaly Detection Demo",
-        url: "https://demo.timeplus.com/anomaly-detection",
-        description: "Interactive anomaly detection visualization",
+        title: "Kafka UI",
+        url: "http://kafka.demo.timeplus.com:8080/topics/otlp_metrics",
+        description: "View raw JSON message in otlp_metrics Kafka topic",
       },
       {
-        title: "OpenSearch Dashboard",
-        url: "https://demo.timeplus.com/opensearch",
-        description: "Detailed logs and analytics",
+        title: "Live Dashboard in Timeplus",
+        url: "https://timeplus.demo.timeplus.com/default/console/dashboard/f38e1645-ea15-4f10-aa69-85f55440ff55",
+        description: "Login with demo/demo123.",
+      },
+      {
+        title: "Live Dashboard in Grafana",
+        url: "https://grafana.demo.timeplus.com/d/a5246160-2353-42eb-8879-90d4a035d03e/real-time-observability",
+        description: "Login with demo/demo123.",
       },
     ],
   },

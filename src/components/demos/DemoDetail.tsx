@@ -16,7 +16,7 @@ const DemoDetail: React.FC<DemoDetailProps> = ({ demo, onBack }) => {
         <img
           src={demo.coverImage}
           alt={`${demo.title} cover`}
-          className="w-full h-full object-cover"
+          className="h-full object-cover"
         />
         <div className="absolute inset-0 bg-gradient-to-t from-timeplus-gray-400 to-transparent opacity-70"></div>
         <div className="absolute bottom-0 left-0 p-6 w-full">
