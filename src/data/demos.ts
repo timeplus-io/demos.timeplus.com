@@ -164,6 +164,16 @@ replace_regex(sm:scope.name,'.*scraper/(.*)','\\1') as scope_name
 ,(metrics:gauge.dataPoints[*][1]):asDouble::double as metrics_value
 from o11y.otlp_metrics where scope_name='loadscraper' and metrics_desc='Average CPU Load over 1 minute.' settings seek_to='-1h'
 );
+
+create external stream sink.splunk_t1 (event string)
+settings
+type = 'http',
+data_format = 'JSONEachRow',
+http_header_Authorization='Splunk 8367dcdd-..1bb',
+url = 'http://hec.splunk.demo.timeplus.com:8088/services/collector/event';
+
+create materialized view o11y.mv_otel_kafka2splunk into sink.splunk_t1
+as select raw as event from o11y.otlp_metrics;
     `,
     demoLinks: [
       {
@@ -180,6 +190,17 @@ from o11y.otlp_metrics where scope_name='loadscraper' and metrics_desc='Average 
         title: "Live Dashboard in Grafana",
         url: "https://grafana.demo.timeplus.com/d/a5246160-2353-42eb-8879-90d4a035d03e/real-time-observability",
         description: "Login with demo/demo123.",
+      },
+      {
+        title: "Live Data in Splunk",
+        url: "https://splunk.demo.timeplus.com/en-US/app/search/search?q=search%20index%3D%22test1%22%20sourcetype%3D_json",
+        description: "Login with demo/demo123.",
+      },
+      {
+        title: "Live Data in OpenSearch",
+        url: "http://opensearch.demo.timeplus.com:5601/app/dev_tools#/console",
+        description:
+          "Login with demo/de1237!Mo, run the default query to match all events",
       },
     ],
   },
