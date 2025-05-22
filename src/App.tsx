@@ -15,22 +15,6 @@ import { demos } from "./data/demos";
 const DemoDetailWrapper: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const [selectedDemoId, setSelectedDemoId] = useState<string | null>(null);
-  const [searchQuery, setSearchQuery] = useState<string>("");
-  const [selectedCategory, setSelectedCategory] = useState<string | undefined>(
-    undefined,
-  );
-
-  const selectedDemo = selectedDemoId
-    ? demos.find((demo) => demo.id === selectedDemoId)
-    : null;
-
-  // Get unique categories from demos
-  React.useEffect(() => {
-    if (id) {
-      setSelectedDemoId(id);
-    }
-  }, [id]);
   const handleBackClick = () => {
     navigate("/");
   };
