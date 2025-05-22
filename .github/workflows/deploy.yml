@@ -26,6 +26,8 @@ jobs:
 
       - name: Build
         run: pnpm run build
+        env:
+          GH_PAGE: true
 
       - name: Deploy to GitHub Pages
         uses: JamesIves/github-pages-deploy-action@v4
