@@ -159,7 +159,6 @@ replace_regex(sm:scope.name,'.*scraper/(.*)','\\1') as scope_name
 from o11y.otlp_metrics where scope_name='loadscraper' and metrics_desc='Average CPU Load over 1 minute.' settings seek_to='-1h'
 );
     `,
-    youtubeVideoLink: "https://www.youtube.com/embed/example2",
     demoLinks: [
       {
         title: "Kafka UI",
