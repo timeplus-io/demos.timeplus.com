@@ -18,10 +18,10 @@ const DemoCard: React.FC<DemoCardProps> = ({ demo, onClick }) => {
         </span>
       </div>
       <div className="relative h-48 overflow-hidden">
-        <img 
-          src={demo.coverImage} 
-          alt={`${demo.title} cover`} 
-          className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105 mt-4"
+        <img
+          src={demo.coverImage}
+          alt={`${demo.title} cover`}
+          className="w-full h-full object-contain transition-transform duration-500 group-hover:scale-105"
         />
       </div>
       
