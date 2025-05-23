@@ -45,7 +45,26 @@ The goal is to create a JSON document for each order, with all line items aggreg
 ✨ Use a range join first, assuming all events for a single transaction arrive within 10 seconds. Join "orders" and "order_details" for the same ID within that time range, then use the order timestamp (not the event timestamp) to run your tumble window aggregation.
 
 ✨ This approach ensures data is ready for immediate analysis, without order splitting, no duplicate and small JOIN state.`,
-    screenshots: [{ desc: "Multiple tables in MySQL", src: "mysql.png" }],
+    screenshots: [
+      { desc: "Multiple tables in MySQL", src: "mysql.png" },
+      { desc: "N+1 CDC messages in Kafka", src: "kafka_msg.png" },
+      {
+        desc: "Kafka external streams for read and GCS/S3 external table for write",
+        src: "lineage.png",
+      },
+      {
+        desc: "N+1 CDC messages turned to 1 JSON doc in S3/GCS",
+        src: "gcs.png",
+      },
+      {
+        desc: "Mutltiple JSON doc in each files in S3/GCS",
+        src: "jsonl.png",
+      },
+      {
+        desc: "JSON files can be querid by BigQuery/Looker",
+        src: "bigquery.png",
+      },
+    ],
     steps: [
       "Create 2 tables in MySQL",
       "Set up Kafka Connect and Debezium MySQL Connector to load changes from MySQL",
@@ -141,21 +160,11 @@ You can install OpenTelemetry collectors on Linux and export data as JSON docume
       "This demo shows how Timeplus integrates with OpenTelemetry to provide a unified observability platform. Logs, metrics and tracing can be collected via open-source or 3rd party OpenTelemetry collector agents and pushed to Timeplus directly or via Kafka. \n\nTimeplus provides real-time processing with streaming SQL and custom filtering and aggregation, as well as built-in alerts and live visualization. By integrating with Grafana, Splunk, OpenSearch and other systems, Timeplus enables DevOps teams with immediate insights into system health and performance.",
     screenshots: [
       {
-        desc: "OpenTelemetry Collector setup on Linux",
-        src: "/screenshots/opentelemetry/collector_setup.png",
+        desc: "Read OpenTelemetry data from Kafka and route to Splunk/OpenSearch",
+        src: "lineage.png",
       },
-      {
-        desc: "Kafka integration for telemetry data",
-        src: "/screenshots/opentelemetry/kafka_integration.png",
-      },
-      {
-        desc: "Timeplus dashboard showing live metrics",
-        src: "/screenshots/opentelemetry/timeplus_dashboard.png",
-      },
-      {
-        desc: "Grafana integration with Timeplus SQL",
-        src: "/screenshots/opentelemetry/grafana_integration.png",
-      },
+      { desc: "Real-time dashboard in Timeplus", src: "timeplus_charts.png" },
+      { desc: "Real-time dashboard in Grafana", src: "grafana.png" },
     ],
     steps: [
       "Install OpenTelemetry Collector on Linux machines",
@@ -241,27 +250,12 @@ as select raw as event from o11y.otlp_metrics;
     solution:
       "Timeplus is designed from the ground up in C++ based on database technology (Clickhouse in this case) but extended for Stream Processing. It leverages Clickhouse libraries and data structures under the hood in its process for extremely fast database operations such as filtering, projection, and aggregations.\n\n&nbsp;\n\nFor stream processing, it has created a native stream data structure as a first class citizen which does not require any coupling  with Apache Kafka although it can integrate with it if required. This allows for a much simpler and more performant system for data ingestion, processing and analytics all in one single binary. Data products created within Timeplus can be pushed out to external systems via Streaming or or consumed via Ad-hoc querying. As such it can easily integrate into the wider ecosystem of systems that integrate with Apache Kafka or Database/BI Tools.",
     screenshots: [
-      {
-        desc: "Timeplus stream processing setup",
-        src: "/screenshots/ksql_alternative/stream_processing.png",
-      },
-      {
-        desc: "Comparison of query performance",
-        src: "/screenshots/ksql_alternative/query_performance.png",
-      },
-      {
-        desc: "Integration with external systems",
-        src: "/screenshots/ksql_alternative/external_integration.png",
-      },
+      { desc: "Comparing Timeplus and ksqlDB", src: "dashboards.png" },
     ],
     steps: [
-      "Install OpenTelemetry Collector on Linux machines",
-      "Configure the collector to send cpu/memory/disk metrics to Kafka",
-      "Create External Stream in Timeplus to read data from Kafka",
-      "Parse and filter the complex JSON message in Timeplus with JSON Path",
-      "Visualize the live metrics in Timeplus built-in dashboards",
-      "Install plugin in Grafana to run streaming SQL for Timeplus and build dashboards",
-      "Forward the logs and metrics to Splunk, OpenSearch and other systems",
+      "Create External Streams in Timplus to read or write Kafka",
+      "Create Materialized Views for streaming data pipelines",
+      "Write data to other systems such as ClickHouse/S3/Iceberg",
     ],
     dataFlowMarkdown: `graph TD;
         A[Apache Kafka Topic]-->T[Timeplus External Stream];
