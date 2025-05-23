@@ -184,17 +184,17 @@ as select raw as event from o11y.otlp_metrics;
       {
         title: "Live Dashboard in Timeplus",
         url: "https://timeplus.demo.timeplus.com/default/console/dashboard/f38e1645-ea15-4f10-aa69-85f55440ff55",
-        description: "Login with demo/demo123.",
+        description: "Login with demo/demo123",
       },
       {
         title: "Live Dashboard in Grafana",
         url: "https://grafana.demo.timeplus.com/d/a5246160-2353-42eb-8879-90d4a035d03e/real-time-observability",
-        description: "Login with demo/demo123.",
+        description: "Login with demo/demo123",
       },
       {
         title: "Live Data in Splunk",
         url: "https://splunk.demo.timeplus.com/en-US/app/search/search?q=search%20index%3D%22test1%22%20sourcetype%3D_json",
-        description: "Login with demo/demo123.",
+        description: "Login with demo/demo1234",
       },
       {
         title: "Live Data in OpenSearch",
