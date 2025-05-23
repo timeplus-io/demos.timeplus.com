@@ -311,4 +311,85 @@ AND to_time(c.time) >= to_time(b.time);
       },
     ],
   },
+  {
+    id: "marketdata",
+    title: "Crypto Market Data",
+    subtitle:
+      "Get real-time data from blockchain, monitor millions of token pairs and deliver insights in subsecond latency.",
+    category: "Stream Processing",
+    keywords: ["bitcoin", "blockchain", "trading", "streaming"],
+    coverImage: "bitcoin_cover.png",
+    introduction: `The cryptocurrency ecosystem generates vast amounts of high-velocity, mutable data. Timeplus can grab latest market data via Web Socket, HTTP Stream or API push and build real-time data pipeline to derive real-time insights.`,
+    challenges: `1️⃣ High Cardinality and Scale: Unlike traditional financial data, blockchain data is decentralized, high-cardinality, constantly mutating, and often needs to be analyzed in real-time. For example, the Ethereum Mainnet alone has processed over 2.7 billion transactions since 2015, with blocks being added every 12 seconds. Faster chains like Arbitrum (250ms block times) and upcoming networks like MegaETH (10ms block times) generate even more data.
+
+2️⃣ Fast Data Mutation: Blockchain data contains high-cardinality attributes such as wallet addresses, transaction hashes, and smart contract interactions, making indexing and querying expensive. The data isn’t static: there are frequent reorganizations, backfills of massive datasets, and fast mutations & event-driven updates.
+
+
+3️⃣ Unlike batch ETL systems where data is transformed in predefined intervals, crypto data requires continuous, incremental updates. Some critical use cases include: tracking real-time asset balances, aggregating market data (olhc), detecting anomalies & fraud.
+
+4️⃣ Crypto applications rely on both point queries and large-scale analytical queries. Some common ones include: fetching specific transactions or NFT balances instantly; aggregating trading volumes for specific assets over different timeframes (e.g. over the last 7 days); analyzing wallet activity trends over time. With high-cardinality datasets and constant updates, these queries must be optimized for performance—without requiring full table scans.
+`,
+    solution:
+      "Timeplus supports mutable streams for high-cardinality, fast-mutating data. Developers can build secondary indexes on mutable streams for high-performance and flexible queries. Timeplus also suppors changelog-based incremental aggregation and hybrid aggregation powered by hybrid hash tables",
+    screenshots: [
+      {
+        desc: "Various ways to get crypto data in Timeplus",
+        src: "sources.png",
+      },
+      {
+        desc: "Real-time OHLC and RSI in Timeplus",
+        src: "dashboard.png",
+      },
+    ],
+    steps: [
+      "Create Web Socket or HTTP Stream to acquire market data, or use Kafka/NATs/REST",
+      "Apply stream processing, mutable data schema and JOIN",
+      "Create real-time alerts or visualization",
+    ],
+    dataFlowMarkdown: `graph TD;
+        T[Timeplus]-->A[Market Data API];
+        Grafana-->T;
+        T-->ClickHouse;
+        T-->B[Other Kafka/Pulsar Topics];
+`,
+    sqlExample: `with ohlc as (
+SELECT
+  window_start as time, earliest(price) AS open, latest(price) AS close, max(price) AS high, min(price) AS low
+FROM
+  tumble(mv_coinbase_tickers_extracted, {{filter_window_size}})
+WHERE product_id = '{{filter_product}}' and _tp_time > now() -{{filter_time_range}}
+GROUP BY
+  window_start
+),
+returns as (
+SELECT
+  time, close, lag(close) AS prev_close, (close - prev_close) / prev_close AS ret
+FROM
+  ohlc
+WHERE
+  prev_close > 0
+)
+SELECT
+  time,
+  lags(ret, 1, 14) AS rets,
+  array_avg(array_map(x -> if(x > 0, x, 0), rets)) AS avg_gains,
+  array_avg(array_map(x -> if(x > 0, 0, -x), rets)) AS avg_losses,
+  avg_gains / avg_losses AS RS,
+  100 - (100/(1+RS)) as RSI
+FROM returns
+    `,
+    demoLinks: [
+      {
+        title: "Live Demo in Timeplus",
+        url: "https://demo.timeplus.cloud/ksql-alt/console/",
+        description: "Login with SSO, choose market-data demo workspace",
+      },
+      {
+        title:
+          "How Zyre Leverages Timeplus for Real-Time Blockchain Analytics at Scale",
+        url: "https://www.timeplus.com/post/customer-story-zyre",
+        description: "Customer story",
+      },
+    ],
+  },
 ];
