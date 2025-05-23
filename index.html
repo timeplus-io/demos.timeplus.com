@@ -2,12 +2,16 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-  <link rel="icon" type="image/svg+xml" href="/src/assets/images/timeplus_logo.svg" />
+  <link rel="icon" type="image/svg+xml" href="timeplus_logo.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Timeplus Demos</title>
+    <script async src="https://data.timeplus.com/p.js"></script>
   </head>
   <body>
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
+    <script>
+    !function(t){var k="ko",i=(window.globalKoalaKey=window.globalKoalaKey||k);if(window[i])return;var ko=(window[i]=[]);["identify","track","removeListeners","on","off","qualify","ready"].forEach(function(t){ko[t]=function(){var n=[].slice.call(arguments);return n.unshift(t),ko.push(n),ko}});var n=document.createElement("script");n.async=!0,n.setAttribute("src","https://cdn.getkoala.com/v1/pk_97c9e8693615e1baf7e10b3779530209fd37/sdk.js"),(document.body || document.head).appendChild(n)}();
+    </script>
   </body>
 </html>
