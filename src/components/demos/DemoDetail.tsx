@@ -18,12 +18,23 @@ mermaid.initialize({
 });
 
 const DemoDetail: React.FC<DemoDetailProps> = ({ demo, onBack }) => {
+  const [isFullScreen, setIsFullScreen] = React.useState(false);
+  const [selectedScreenshot, setSelectedScreenshot] = React.useState<{
+    desc: string;
+    src: string;
+  } | null>(null);
+
   React.useEffect(() => {
     mermaid.init(
       undefined,
       document.querySelectorAll('.mermaid:not([data-processed="true"])'),
     );
   }, [demo.dataFlowMarkdown]);
+
+  const handleScreenshotClick = (screenshot: { desc: string; src: string }) => {
+    setSelectedScreenshot(screenshot);
+    setIsFullScreen(true);
+  };
   return (
     <div className="bg-timeplus-gray-300 rounded-lg overflow-hidden">
       <div className="relative h-64 md:h-80 overflow-hidden">
@@ -95,6 +106,64 @@ inline-block"
             <ReactMarkdown>{demo.solution}</ReactMarkdown>
           </div>
         </div>
+
+        {demo.screenshots && demo.screenshots.length > 0 && (
+          <div className="mb-8">
+            <h2 className="text-2xl font-bold text-white mb-4">Screenshots</h2>
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+              {demo.screenshots.map((screenshot, index) => (
+                <div key={index} className="relative group">
+                  <img
+                    src={`screenshots/${demo.id}/${screenshot.src}`}
+                    alt={screenshot.desc}
+                    className="w-full h-48 object-cover rounded-lg cursor-pointer hover:opacity-80 transition-opacity"
+                    onClick={() => {
+                      handleScreenshotClick(screenshot);
+                    }}
+                  />
+                  <div className="absolute bottom-0 left-0 right-0 bg-black bg-opacity-50 text-white text-sm p-2 rounded-b-lg opacity-0 group-hover:opacity-100 transition-opacity">
+                    {screenshot.desc}
+                  </div>
+                </div>
+              ))}
+            </div>
+            {/* Full-screen view with close button implemented below */}
+            {isFullScreen && selectedScreenshot && (
+              <div
+                className="fixed inset-0 bg-black bg-opacity-90 z-50 flex items-center justify-center"
+                onClick={() => setIsFullScreen(false)}
+              >
+                <img
+                  src={`screenshots/${demo.id}/${selectedScreenshot.src.split("/").pop()}`}
+                  alt={selectedScreenshot.desc}
+                  className="max-w-[90%] max-h-[90%] object-contain"
+                />
+                <button
+                  onClick={() => setIsFullScreen(false)}
+                  className="absolute top-4 right-4 text-white bg-timeplus-gray-200 rounded-full w-8 h-8 flex items-center justify-center"
+                >
+                  X
+                </button>
+                <div className="absolute bottom-4 left-0 right-0 text-center text-white px-4">
+                  {selectedScreenshot.desc}
+                </div>
+              </div>
+            )}
+            {/* Full-screen modal placeholder (to be implemented in UI):
+            {isFullScreen && selectedScreenshot && (
+              <div className="fixed inset-0 bg-black bg-opacity-90 z-50 flex items-center justify-center">
+                <img src={selectedScreenshot.src} alt={selectedScreenshot.desc} className="max-w-full max-h-full" />
+                <button
+                  onClick={() => setIsFullScreen(false)}
+                  className="absolute top-4 right-4 text-white bg-timeplus-gray-200 rounded-full w-8 h-8 flex items-center justify-center"
+                >
+                  X
+                </button>
+                <div className="absolute bottom-4 left-0 right-0 text-center text-white">{selectedScreenshot.desc}</div>
+              </div>
+            )} */}
+          </div>
+        )}
 
         <div className="mb-8">
           <h2 className="text-2xl font-bold text-white mb-4">Key Steps</h2>
