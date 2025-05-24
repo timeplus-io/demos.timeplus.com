@@ -4,11 +4,11 @@ export interface Demo {
   subtitle: string;
   category: string;
   keywords: string[];
-  coverImage: string;
+  coverImage: string; //ratio: 2:1
   introduction: string;
   challenges: string;
   solution: string;
-  screenshots: { desc: string; src: string }[];
+  screenshots: { desc: string; src: string }[]; //ratio: 4:3
   steps: string[];
   dataFlowImage?: string; // Made optional
   dataFlowMarkdown?: string; // Added for Mermaid.js content
@@ -318,6 +318,100 @@ AND to_time(c.time) >= to_time(b.time);
         title: "📝 Comparing Timeplus and ksqlDB",
         url: "https://www.timeplus.com/timeplus-vs-ksqldb",
         description: "White paper to compare those 2 products",
+      },
+    ],
+  },
+  {
+    id: "kafka2ch",
+    title: "Kafka To ClickHouse",
+    subtitle:
+      "Query data in Kafka with SQL, apply join and lookup and send high quality data to ClickHouse.",
+    category: "Pipeline",
+    keywords: ["kafka", "sql", "clickhouse", "streaming", "join"],
+    coverImage: "kafak2ch_cover.png",
+    introduction: `Apache Kafka is a common data source for real-time data. ClickHouse and a few other OLAP databases can consume data from Kafka, but with various limitations. Timeplus provides high-performance and flexible way to query data in Kafka, join with other data sources and send transformed data to ClickHouse or other descriptions.`,
+    challenges: `1️⃣ The KafkaEngine in ClickHouse can connect ClickHouse with Kafka, but you cannot query tables in KafkaEngine directly in ClickHouse. You have to create Materialized Views to query Kafka data. This is not productive or flexible to explore the best way to run proper SQL query for the Kafka data.
+
+2️⃣ ClickHouse Materialized Views do not support UNION operations or complex JOINs. This severely limits the ability to create denormalized records or to combine data from multiple sources, which is often necessary in real-world analytics scenarios.
+
+
+3️⃣ ClickHouse Materialized Views can only operate on a single input table. This restricts the ability to create views that combine or correlate data from multiple sources (for example, JOIN data from 2 active Kafka topics), limiting their usefulness in complex data environments.
+
+4️⃣ Materialized Views in ClickHouse are updated only when new data is inserted into the input table. This means that updates or deletions in the source data are not reflected in the view, potentially leading to inconsistencies.
+`,
+    solution: `Timeplus is a modern stream processing platform designed to handle real-time data with low latency supporting native streams as well as data from popular streaming platforms such as Apache Kafka. It excels in processing, joining, and preparing streaming data before it reaches the final storage system, e.g. ClickHouse. The benefits of adding Timeplus between Kafka and ClickHouse are:
+
+✨ You can query Kafka data without having to set up materialized views. Explore the Kafka data using SQL or web console.
+
+✨ Timeplus can run complex SQL to join data from multiple Kafka external streams, or apply lookups with other ClickHouse/MySQL/Postgres tables.
+
+✨ Timeplus supports continuous and incremental stream processing, such as tumble, hop, session windows, watermark and out-of-order processing.`,
+    screenshots: [
+      {
+        desc: "Read real-time data from one Kafka topic and set up complex pipelines to transform the data.",
+        src: "lineage.png",
+      },
+    ],
+    steps: [
+      "Create Kafka External Stream in Timeplus to read data from Kafka",
+      "Explore the Kafka data with ad-hoc SQL without having to create materialized views",
+      "Create ClickHouse External Table to read from or write to ClickHouse",
+      "Create Materialized Views with complex SQL to read multiple Kafka topics and send streaming transformed data to ClickHouse",
+    ],
+    dataFlowMarkdown: `graph TD;
+        K[Apache Kafka]-->T[Timeplus]-->ClickHouse;
+`,
+    sqlExample: `-- read from a Kafka topic
+create external stream eventstream(raw string)
+SETTINGS type = 'kafka', brokers = 'kafka.demo.timeplus.com:9092',
+topic = 'owlshop-frontend-events', sasl_mechanism = 'PLAIN',
+username = 'demo', password = 'demo123', security_protocol = 'SASL_SSL',
+skip_ssl_cert_check = true;
+
+-- set up a external table to write to remote ClickHouse
+create external table default.http_code_count_5s
+SETTINGS type = 'clickhouse', address = 'clickhouse.demo.timeplus.com:9000',
+user = 'demo', password = 'demo123', database = 'demo',
+table = 'http_code_count_5s';
+
+-- create a materialized view as a streaming data pipeline
+create materialized view mv_5s_tumble_then_join into http_code_count_5s as
+with statuscode as(
+    select _tp_time, cast(raw:response.statuscode, 'uint8') as code
+    from eventstream
+  ), countbystatus as(
+    select window_start, code, count() as views
+    from tumble(statuscode, 5s)
+    group by window_start, code
+  )
+select window_start as ts, code, status, views
+from countbystatus
+inner join dim_code_to_status using (code);`,
+    demoLinks: [
+      {
+        title: "Kafka UI",
+        url: "http://kafka.demo.timeplus.com:8080/topics/owlshop-frontend-events",
+        icon: "apachekafka_white.png",
+        description: "View raw Kafka messages",
+      },
+      {
+        title: "Live Demo in Timeplus",
+        url: "https://demo.timeplus.cloud/sp/console/",
+        icon: "timeplus_logo.svg",
+        description:
+          "Login with SSO, choose 'Stream Processing' demo workspace",
+      },
+      {
+        title: "ClickHouse UI",
+        url: "http://clickhouse.demo.timeplus.com:8123/play?password=demo123&user=demo#c2VsZWN0ICogZnJvbSBkZW1vLmh0dHBfY29kZV9jb3VudF81cyBvcmRlciBieSB0cyBkZXNjIGxpbWl0IDM=",
+        icon: "clickhouse_logo_square_120.png",
+        description: "Query the tables in ClickHouse",
+      },
+      {
+        title: "📝 Comparing ClickHouse and Timeplus",
+        url: "https://www.timeplus.com/timeplus-and-clickhouse",
+        description:
+          "Timeplus complements ClickHouse by providing better Kafka integration and robust stream processing capabilities",
       },
     ],
   },
