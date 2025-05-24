@@ -8,16 +8,20 @@ import { Demo } from "../../data/demos";
 interface DemoDetailProps {
   demo: Demo;
   onBack: () => void;
+  onTagClick?: (tag: string) => void;
 }
 
-// Initialize Mermaid.js v11
 mermaid.initialize({
   startOnLoad: false,
   theme: "dark",
   securityLevel: "loose",
 });
 
-const DemoDetail: React.FC<DemoDetailProps> = ({ demo, onBack }) => {
+const DemoDetail: React.FC<DemoDetailProps> = ({
+  demo,
+  onBack,
+  onTagClick = () => {},
+}) => {
   const [isFullScreen, setIsFullScreen] = React.useState(false);
   const [selectedScreenshot, setSelectedScreenshot] = React.useState<{
     desc: string;
@@ -78,8 +82,10 @@ inline-block"
         <div className="flex flex-wrap gap-2 mb-6">
           {demo.keywords.map((keyword, index) => (
             <span
+              onClick={() => onTagClick(keyword)}
               key={index}
-              className="px-2 py-1 text-xs rounded-md bg-timeplus-gray-200 text-timeplus-gray-100"
+              className="px-2 py-1 text-xs rounded-md bg-timeplus-gray-200 text-timeplus-gray-100
+hover:bg-timeplus-gray-100 hover:text-white cursor-pointer" // <-- Updated this line
             >
               {keyword}
             </span>
@@ -116,18 +122,21 @@ inline-block"
                   <img
                     src={`screenshots/${demo.id}/${screenshot.src}`}
                     alt={screenshot.desc}
-                    className="w-full h-48 object-cover rounded-lg cursor-pointer hover:opacity-80 transition-opacity"
+                    className="w-full h-48 object-cover rounded-lg cursor-pointer hover:opacity-80
+transition-opacity"
                     onClick={() => {
                       handleScreenshotClick(screenshot);
                     }}
                   />
-                  <div className="absolute bottom-0 left-0 right-0 bg-black bg-opacity-50 text-white text-sm p-2 rounded-b-lg opacity-0 group-hover:opacity-100 transition-opacity">
+                  <div
+                    className="absolute bottom-0 left-0 right-0 bg-black bg-opacity-50 text-white text-sm p-2
+rounded-b-lg opacity-0 group-hover:opacity-100 transition-opacity"
+                  >
                     {screenshot.desc}
                   </div>
                 </div>
               ))}
             </div>
-            {/* Full-screen view with close button implemented below */}
             {isFullScreen && selectedScreenshot && (
               <div
                 className="fixed inset-0 bg-black bg-opacity-90 z-50 flex items-center justify-center"
@@ -140,28 +149,16 @@ inline-block"
                 />
                 <button
                   onClick={() => setIsFullScreen(false)}
-                  className="absolute top-4 right-4 text-white bg-timeplus-gray-200 rounded-full w-8 h-8 flex items-center justify-center"
+                  className="absolute top-4 right-4 text-white bg-timeplus-gray-200 rounded-full w-8 h-8 flex
+items-center justify-center"
                 >
-                  X
+                  ✖️
                 </button>
                 <div className="absolute bottom-4 left-0 right-0 text-center text-white px-4">
                   {selectedScreenshot.desc}
                 </div>
               </div>
             )}
-            {/* Full-screen modal placeholder (to be implemented in UI):
-            {isFullScreen && selectedScreenshot && (
-              <div className="fixed inset-0 bg-black bg-opacity-90 z-50 flex items-center justify-center">
-                <img src={selectedScreenshot.src} alt={selectedScreenshot.desc} className="max-w-full max-h-full" />
-                <button
-                  onClick={() => setIsFullScreen(false)}
-                  className="absolute top-4 right-4 text-white bg-timeplus-gray-200 rounded-full w-8 h-8 flex items-center justify-center"
-                >
-                  X
-                </button>
-                <div className="absolute bottom-4 left-0 right-0 text-center text-white">{selectedScreenshot.desc}</div>
-              </div>
-            )} */}
           </div>
         )}
 
