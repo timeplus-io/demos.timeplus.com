@@ -17,6 +17,7 @@ export interface Demo {
   demoLinks: {
     title: string;
     url: string;
+    icon?: string;
     description?: string;
   }[];
 }
@@ -131,11 +132,13 @@ group by window_start,orderNumber;`,
       {
         title: "Kafka UI",
         url: "http://kafka.demo.timeplus.com:8080/topics/demo.cdc.mysql.retailer.orders",
+        icon: "apachekafka_white.png",
         description: "View raw Kafka topics and messages",
       },
       {
         title: "Timeplus Enterprise",
         url: "https://timeplus.demo.timeplus.com",
+        icon: "timeplus_logo.svg",
         description:
           "Login with demo/demo123. Check data lineage for retailer_etl namespace",
       },
@@ -208,26 +211,31 @@ as select raw as event from o11y.otlp_metrics;
       {
         title: "Kafka UI",
         url: "http://kafka.demo.timeplus.com:8080/topics/otlp_metrics",
+        icon: "apachekafka_white.png",
         description: "View raw JSON message in otlp_metrics Kafka topic",
       },
       {
         title: "Live Dashboard in Timeplus",
         url: "https://timeplus.demo.timeplus.com/default/console/dashboard/f38e1645-ea15-4f10-aa69-85f55440ff55",
+        icon: "timeplus_logo.svg",
         description: "Login with demo/demo123",
       },
       {
         title: "Live Dashboard in Grafana",
         url: "https://grafana.demo.timeplus.com/d/a5246160-2353-42eb-8879-90d4a035d03e/real-time-observability",
+        icon: "Grafana_logo.svg",
         description: "Login with demo/demo123",
       },
       {
         title: "Live Data in Splunk",
         url: "https://splunk.demo.timeplus.com/en-US/app/search/search?q=search%20index%3D%22test1%22%20sourcetype%3D_json",
+        icon: "splunk_github.jpeg",
         description: "Login with demo/demo1234",
       },
       {
         title: "Live Data in OpenSearch",
         url: "http://opensearch.demo.timeplus.com:5601/app/dev_tools#/console",
+        icon: "opensearch_mark_default.svg",
         description:
           "Login with demo/de1237!Mo, run the default query to match all events",
       },
@@ -297,15 +305,17 @@ AND to_time(c.time) >= to_time(b.time);
       {
         title: "Live Demo in Timeplus",
         url: "https://demo.timeplus.cloud/ksql-alt/console/",
+        icon: "timeplus_logo.svg",
         description: "Login with SSO, choose ksql demo workspace",
       },
       {
         title: "Kafka UI",
         url: "http://kafka.demo.timeplus.com:8080/topics/otlp_metrics",
+        icon: "apachekafka_white.png",
         description: "View raw JSON message in otlp_metrics Kafka topic",
       },
       {
-        title: "Comparing Timeplus and ksqlDB",
+        title: "📝 Comparing Timeplus and ksqlDB",
         url: "https://www.timeplus.com/timeplus-vs-ksqldb",
         description: "White paper to compare those 2 products",
       },
@@ -382,11 +392,12 @@ FROM returns
       {
         title: "Live Demo in Timeplus",
         url: "https://demo.timeplus.cloud/ksql-alt/console/",
+        icon: "timeplus_logo.svg",
         description: "Login with SSO, choose market-data demo workspace",
       },
       {
         title:
-          "How Zyre Leverages Timeplus for Real-Time Blockchain Analytics at Scale",
+          "📝 How Zyre Leverages Timeplus for Real-Time Blockchain Analytics at Scale",
         url: "https://www.timeplus.com/post/customer-story-zyre",
         description: "Customer story",
       },
