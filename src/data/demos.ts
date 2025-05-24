@@ -31,16 +31,16 @@ export const demos: Demo[] = [
     category: "Pipeline",
     keywords: ["cdc", "debezium", "kafka", "pipeline", "s3", "oltp", "olap"],
     coverImage: "cdc_cover.png",
-    introduction: `It's common to design your OLTP database schema in the normalized way. For example, when a customer places an order with multiple line items, one row will be added to the "orders" MySQL table with a "orderNumber", and multiple rows to add in the "order_details" table with the same "orderNumber".
+    introduction: `A common practice in OLTP database design is normalization. For instance, processing a customer order with multiple line items typically involves inserting one row into an "orders" table and multiple rows into an "order_details" table, linked by an "orderNumber".
 
-The goal is to create a JSON document for each order, with all line items aggregated, with the subtotal calculated, so that BigQuery can run SQL for those JSON files in GCS and no need to perform expensive JOINs.`,
-    challenges: `1️⃣ You can capture database changes via tools like Debezium and make the change feed available in Apache Kafka. However since each order include 1 new row in "orders" and multiple rows in "order_details", the time stamp for those CDC messages are not exactly same. A naive JOIN by "orderNumber" and timestamp won't catch all changes.
+The objective is to generate a denormalized JSON document for each order, aggregating all line items and calculating subtotals. This structure enables efficient querying in OLAP systems like BigQuery (via GCS) by eliminating the need for expensive JOIN operations at query time.`,
+    challenges: `1️⃣ **Data Correlation Complexity with CDC:** Capturing database changes using tools like Debezium and streaming them via Apache Kafka is a standard approach. However, because a single logical transaction (e.g., an order) results in multiple CDC messages (one for "orders", several for "order_details") with slightly different timestamps, a naive JOIN based on "orderNumber" and exact event timestamps can lead to incomplete data aggregation.
 
-2️⃣ Tumble window aggregations (say every 10s) can split one order across two windows if the customer adds items right at the edge
+2️⃣ **Windowing Challenges:** Tumble window aggregations (e.g., 10-second intervals) risk splitting a single order's data across two consecutive windows if line items are added near the window boundary.
 
-3️⃣ Sliding windows (hop) solve the split but now you get duplicate events
+3️⃣ **Duplicate Events with Sliding Windows:** While sliding windows (hop windows) can mitigate the order splitting issue, they may introduce duplicate events in the output, requiring further deduplication logic.
 
-4️⃣ Global aggregation keeps everything in memory—great until your state grows to 100GB in a week…`,
+4️⃣ **Scalability of Global Aggregation:** Global aggregation, while ensuring complete data capture for a transaction, becomes impractical as the state size grows significantly (e.g., potentially reaching hundreds of gigabytes), leading to excessive memory consumption and performance degradation.`,
     solution: `✨ Timeplus can seamlessly connect OLTP systems like MySQL, using technologies such as Debezium for Change Data Capture (CDC) and Kafka for streaming.
 
 ✨ Use a range join first, assuming all events for a single transaction arrive within 10 seconds. Join "orders" and "order_details" for the same ID within that time range, then use the order timestamp (not the event timestamp) to run your tumble window aggregation.
@@ -152,13 +152,12 @@ group by window_start,orderNumber;`,
     category: "Observability",
     keywords: ["kafka", "opentelemetry", "grafana", "sql"],
     coverImage: "otlp_cover.png",
-    introduction: `[OpenTelemetry](https://opentelemetry.io/) is a collection of APIs, SDKs, and tools. Use it to instrument, generate, collect, and export telemetry data (metrics, logs, and traces) to help you analyze your software’s performance and behavior.
-You can install OpenTelemetry collectors on Linux and export data as JSON documents in Kafka topics and have Timeplus to run streaming ETL, routing, alerts and visualization.`,
-    challenges: `1️⃣ While the OpenTelemetry schema is open and flexible, the exported JSON documents are usually with thousands of lines per messages, with nested structure. Parsing and filtering such complex JSON documents are not easy and error-prone.
+    introduction: `[OpenTelemetry (OTel)](https://opentelemetry.io/) provides a standardized framework of APIs, SDKs, and tools for instrumenting, generating, collecting, and exporting telemetry data (metrics, logs, and traces). This data is crucial for analyzing software performance and behavior. OTel collectors, deployable on systems such as Linux, can export this data, often as JSON documents, to messaging systems like Apache Kafka. Timeplus can then consume this data for streaming ETL, data routing, alert generation, and real-time visualization.`,
+    challenges: `1️⃣ **Complex Data Structures:** The OpenTelemetry schema, while open and flexible, often results in verbose JSON documents with complex, nested structures, potentially spanning thousands of lines per message. Parsing and filtering these documents efficiently and accurately presents a significant challenge.
 
-2️⃣ Storing such complex JSON documents on Kafka and OLAP data warehouse lead to high cost of storage and computing
+2️⃣ **Storage and Compute Costs:** Storing voluminous and complex JSON documents in Kafka and subsequently in OLAP data warehouses can lead to substantial storage and computational costs.
 
-3️⃣ Metrics and logs across different machines are usually collated to understand the big picture or troubleshot issues. JOIN data across mulitiple data sources and ID is usually a challenge in Grafana, Splunk and other platforms. Timestamps for those collated events are close but not exactly same.`,
+3️⃣ **Cross-Source Correlation:** Correlating metrics and logs from distributed systems is essential for comprehensive observability and troubleshooting. However, joining data across multiple sources based on identifiers can be challenging in conventional platforms (e.g., Grafana, Splunk), especially when dealing with events that have closely aligned but not identical timestamps.`,
     solution:
       "This demo shows how Timeplus integrates with OpenTelemetry to provide a unified observability platform. Logs, metrics and tracing can be collected via open-source or 3rd party OpenTelemetry collector agents and pushed to Timeplus directly or via Kafka. \n\nTimeplus provides real-time processing with streaming SQL and custom filtering and aggregation, as well as built-in alerts and live visualization. By integrating with Grafana, Splunk, OpenSearch and other systems, Timeplus enables DevOps teams with immediate insights into system health and performance.",
     screenshots: [
@@ -248,13 +247,12 @@ as select raw as event from o11y.otlp_metrics;
     category: "Stream Processing",
     keywords: ["kafka", "sql", "database"],
     coverImage: "ksql_cover.png",
-    introduction: `[ksqlDB](https://www.confluent.io/product/ksqldb/) is a stream processing engine designed specifically to read data from Apache Kafka topics, create stateless/stateful transformations, and write them back to Apache Kafka. Data then has to be landed in other dedicated downstream systems for rich query capability. It was renamed from KSQL to ksqlDB with limited capabilities to query some of the derived state from stream processing functions. These “ad-hoc” queries are limited to quick lookups via primary key equality or range queries..`,
-    challenges: `1️⃣ Limited Query and Join Capabilities: ksqlDB does not have the capability to answer any ad-hoc queries as a database or data warehouse would. It can only do certain key based lookups or range lookups. The data can also be joined in very limited ways based on primary key lookups.
+    introduction: `[ksqlDB](https://www.confluent.io/product/ksqldb/), a stream processing engine by Confluent, is primarily designed for consuming data from Apache Kafka topics, performing stateless or stateful transformations, and writing results back to Kafka. For comprehensive analytical querying, data typically needs to be offloaded to specialized downstream systems. While ksqlDB offers some capabilities for querying derived state (e.g., materialized views), these ad-hoc queries are generally restricted to primary key lookups or simple range scans.`,
+    challenges: `1️⃣ **Limited Ad-Hoc Querying and Join Capabilities:** ksqlDB's query capabilities fall short of those offered by traditional databases or data warehouses, primarily supporting key-based lookups and range scans. Its JOIN operations are also restricted, often limited to primary key relationships.
 
-2️⃣ The performance of ksqlDB can be impacted by the time needed to serialize and deserialize data between Apache Kafka and RocksDB. The strong coupling to Kafka also has a big impact on performance: frequent data publication and retrieval from Kafka can increase latency and costs.
+2️⃣ **Performance Considerations:** ksqlDB's performance can be affected by serialization/deserialization overhead between Apache Kafka and its underlying state store (RocksDB). Its tight coupling with Kafka, involving frequent data transmission and reception, can contribute to increased latency and operational costs.
 
-
-3️⃣ ksqlDB state stores are notoriously difficult to maintain due to limitations in TTL management and other storage configurations. State stores are backed in Apache Kafka and thus require way more storage and network bandwidth overall for high availability and resilience.`,
+3️⃣ **State Management Complexity:** Managing ksqlDB state stores can be challenging due to limitations in Time-To-Live (TTL) configurations and other storage settings. State persistence, often reliant on Kafka topics, can lead to increased storage and network bandwidth requirements for achieving high availability and resilience.`,
     solution:
       "Timeplus is designed from the ground up in C++ based on database technology (Clickhouse in this case) but extended for Stream Processing. It leverages Clickhouse libraries and data structures under the hood in its process for extremely fast database operations such as filtering, projection, and aggregations.\n\n&nbsp;\n\nFor stream processing, it has created a native stream data structure as a first class citizen which does not require any coupling  with Apache Kafka although it can integrate with it if required. This allows for a much simpler and more performant system for data ingestion, processing and analytics all in one single binary. Data products created within Timeplus can be pushed out to external systems via Streaming or or consumed via Ad-hoc querying. As such it can easily integrate into the wider ecosystem of systems that integrate with Apache Kafka or Database/BI Tools.",
     screenshots: [
@@ -329,16 +327,14 @@ AND to_time(c.time) >= to_time(b.time);
     category: "Pipeline",
     keywords: ["kafka", "sql", "clickhouse", "streaming", "join"],
     coverImage: "kafak2ch_cover.png",
-    introduction: `Apache Kafka is a common data source for real-time data. ClickHouse and a few other OLAP databases can consume data from Kafka, but with various limitations. Timeplus provides high-performance and flexible way to query data in Kafka, join with other data sources and send transformed data to ClickHouse or other descriptions.`,
-    challenges: `1️⃣ The KafkaEngine in ClickHouse can connect ClickHouse with Kafka, but you cannot query tables in KafkaEngine directly in ClickHouse. You have to create Materialized Views to query Kafka data. This is not productive or flexible to explore the best way to run proper SQL query for the Kafka data.
+    introduction: `Apache Kafka is a prevalent source for real-time data streams. While OLAP databases like ClickHouse offer Kafka consumption capabilities, they often come with certain limitations. Timeplus offers a high-performance and flexible solution for querying data directly within Kafka, performing complex joins with other data sources, and delivering transformed, high-quality data to destinations such as ClickHouse or other analytical systems.`,
+    challenges: `1️⃣ **Indirect Kafka Data Access in ClickHouse:** ClickHouse's KafkaEngine allows integration with Kafka, but direct querying of KafkaEngine tables is not supported. Users must create Materialized Views to access and process Kafka data, which can hinder interactive data exploration and iterative query development.
 
-2️⃣ ClickHouse Materialized Views do not support UNION operations or complex JOINs. This severely limits the ability to create denormalized records or to combine data from multiple sources, which is often necessary in real-world analytics scenarios.
+2️⃣ **Limited SQL Capabilities in ClickHouse Materialized Views:** ClickHouse Materialized Views have restrictions, such as lack of support for UNION ALL operations on KafkaEngine tables or complex JOINs (e.g., joining multiple Kafka topics). This limits their utility in creating denormalized datasets or combining information from disparate sources, common requirements in analytical workloads.
 
+3️⃣ **Single Source Limitation for Materialized Views:** ClickHouse Materialized Views typically operate on a single input table. This constraint restricts the creation of views that consolidate or correlate data from multiple Kafka topics or other sources simultaneously, impacting their effectiveness in complex data integration scenarios.
 
-3️⃣ ClickHouse Materialized Views can only operate on a single input table. This restricts the ability to create views that combine or correlate data from multiple sources (for example, JOIN data from 2 active Kafka topics), limiting their usefulness in complex data environments.
-
-4️⃣ Materialized Views in ClickHouse are updated only when new data is inserted into the input table. This means that updates or deletions in the source data are not reflected in the view, potentially leading to inconsistencies.
-`,
+4️⃣ **Triggered by ingestion only:** Materialized Views in ClickHouse are updated only when new data is inserted into the input table. This means that you can not run incremental aggregation based on a tumble, hop or session window.`,
     solution: `Timeplus is a modern stream processing platform designed to handle real-time data with low latency supporting native streams as well as data from popular streaming platforms such as Apache Kafka. It excels in processing, joining, and preparing streaming data before it reaches the final storage system, e.g. ClickHouse. The benefits of adding Timeplus between Kafka and ClickHouse are:
 
 ✨ You can query Kafka data without having to set up materialized views. Explore the Kafka data using SQL or web console.
@@ -423,16 +419,14 @@ inner join dim_code_to_status using (code);`,
     category: "Stream Processing",
     keywords: ["bitcoin", "blockchain", "trading", "streaming"],
     coverImage: "bitcoin_cover.png",
-    introduction: `The cryptocurrency ecosystem generates vast amounts of high-velocity, mutable data. Timeplus can grab latest market data via Web Socket, HTTP Stream or API push and build real-time data pipeline to derive real-time insights.`,
-    challenges: `1️⃣ High Cardinality and Scale: Unlike traditional financial data, blockchain data is decentralized, high-cardinality, constantly mutating, and often needs to be analyzed in real-time. For example, the Ethereum Mainnet alone has processed over 2.7 billion transactions since 2015, with blocks being added every 12 seconds. Faster chains like Arbitrum (250ms block times) and upcoming networks like MegaETH (10ms block times) generate even more data.
+    introduction: `The cryptocurrency ecosystem is characterized by the generation of high-volume, high-velocity, and frequently mutable data. Timeplus facilitates the ingestion of real-time market data through various mechanisms, including WebSockets, HTTP Streams, or API push notifications, enabling the construction of sophisticated data pipelines for deriving immediate insights.`,
+    challenges: `1️⃣ **High Cardinality and Extreme Scale:** Blockchain data, distinct from traditional financial data, is decentralized, exhibits high cardinality (e.g., wallet addresses, transaction hashes), undergoes constant mutation, and necessitates real-time analysis. For instance, the Ethereum Mainnet has processed billions of transactions, with new blocks appended at frequent intervals (e.g., every ~12 seconds). Emerging Layer 2 solutions and newer blockchain architectures generate data at even higher velocities (e.g., block times of 250ms or even 10ms).
 
-2️⃣ Fast Data Mutation: Blockchain data contains high-cardinality attributes such as wallet addresses, transaction hashes, and smart contract interactions, making indexing and querying expensive. The data isn’t static: there are frequent reorganizations, backfills of massive datasets, and fast mutations & event-driven updates.
+2️⃣ **Rapid Data Mutation and Complexity:** The inherent nature of blockchain data, with its high-cardinality attributes (wallet addresses, transaction hashes, smart contract interactions), makes indexing and querying computationally intensive. Furthermore, the data is dynamic, subject to frequent reorganizations (reorgs), large-scale backfills, and rapid, event-driven updates.
 
+3️⃣ **Continuous and Incremental Processing Demand:** In contrast to batch ETL paradigms, crypto data analysis demands continuous and incremental processing. Critical use cases include real-time asset balance tracking, live aggregation of market data (e.g., OHLC - Open, High, Low, Close), and immediate anomaly or fraud detection.
 
-3️⃣ Unlike batch ETL systems where data is transformed in predefined intervals, crypto data requires continuous, incremental updates. Some critical use cases include: tracking real-time asset balances, aggregating market data (olhc), detecting anomalies & fraud.
-
-4️⃣ Crypto applications rely on both point queries and large-scale analytical queries. Some common ones include: fetching specific transactions or NFT balances instantly; aggregating trading volumes for specific assets over different timeframes (e.g. over the last 7 days); analyzing wallet activity trends over time. With high-cardinality datasets and constant updates, these queries must be optimized for performance—without requiring full table scans.
-`,
+4️⃣ **Hybrid Query Workloads:** Crypto applications typically require support for both low-latency point queries (e.g., fetching a specific transaction or NFT balance) and complex analytical queries (e.g., aggregating trading volumes over various timeframes, analyzing wallet activity trends). Optimizing these diverse query patterns over high-cardinality, constantly updating datasets, without resorting to full table scans, is a significant technical hurdle.`,
     solution:
       "Timeplus supports mutable streams for high-cardinality, fast-mutating data. Developers can build secondary indexes on mutable streams for high-performance and flexible queries. Timeplus also suppors changelog-based incremental aggregation and hybrid aggregation powered by hybrid hash tables",
     screenshots: [
