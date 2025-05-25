@@ -25,7 +25,7 @@ export interface Demo {
 export const demos: Demo[] = [
   {
     id: "cdc",
-    title: "OLTP to OLAP Pipeline",
+    title: "OLTP to OLAP",
     subtitle:
       "Denormalize N+1 records in MySQL to a JSON doc, and Save in S3/GCS.",
     category: "Pipeline",
@@ -408,6 +408,97 @@ inner join dim_code_to_status using (code);`,
         url: "https://www.timeplus.com/timeplus-and-clickhouse",
         description:
           "Timeplus complements ClickHouse by providing better Kafka integration and robust stream processing capabilities",
+      },
+    ],
+  },
+  {
+    id: "msk2iceberg",
+    title: "MSK To Iceberg",
+    subtitle:
+      "Query data in Amazon Managed Streaming for Apache Kafka (MSK) with SQL, apply join and lookup and save high quality data in Apache Iceberg, for low cost storage and multi-engine queries.",
+    category: "Pipeline",
+    keywords: ["kafka", "sql", "aws", "msk", "iceberg", "etl"],
+    coverImage: "msk2iceberg_cover.png",
+    introduction: `Apache Kafka is a prevalent source for real-time data streams and Amazon MSK is a fully managed cloud service on AWS. To query the data in Kafka, it's common to use Apache Flink or Apache Spark frameworks to consume the data but Flink and Spark are expensive to operate. Timeplus offers a high-performance and flexible solution to process data in MSK and delivery transformed, high-quality data to S3 in Apache Iceberg open format.`,
+    challenges: `1️⃣ **Kafka is not designed for analytics:** Apache Kafka is great for microservices to talk to each other, or transport data in JSON, Avro, Protobuf or even arbitary binary format among the system, but it's not designed to run analylatics workload directly. It's expensive to keep big data on Kafka. There is no index to optimize the data scan. So it's commmon to process the data in Kafka and put them in a OALP database or data lake such as in Apache Iceberg format.
+
+2️⃣ **Apache Flink/Spark are expensive to operate:** Setting up Amazon Managed Service for Apache Flink is one solution to run stream processing applications. You can also enable Apache Spark in Amazon EMR. Both Flink and Spark are hard to learn, complex to set up and expensive to operate.
+
+3️⃣ **Batch ETL introduces data latency:** Other solutions such as Airbyte or Apache NiFi can set up batch ETL pipeline to process data in Kafka and insert into database or datalake. They are less resource intensive as Spark or Flink, but such batch ETL turns real-time data as daily or hourly stale data.
+
+4️⃣ **Apache Iceberg is a promosing open data format but JVM centric:** [Apache Iceberg](https://iceberg.apache.org/) is a high-performance format for huge analytic tables. You can build Iceberg-based data lake with Amazon S3, or S3 Table. However today's Iceberg ecosystem is JVM-centric, common engines such as Aparch Spark, Trino, Flink and Hive. High performances engines like ClickHouse or DuckDB only support reading data from Iceberg but not to write to it.`,
+    solution: `Timeplus is a modern stream processing platform designed to handle real-time data with low latency supporting native streams as well as data from popular streaming platforms such as Apache Kafka or Amazon MSK. It excels in processing, joining, and preparing streaming data before it reaches the final storage system, e.g. Iceberg. The benefits of adding Timeplus between Kafka and Iceberg are:
+
+✨ Timeplus is implemented in C++ and delivers amazing performance, low latency and cost infrasturre cost, comparing to Apache Flink or Spark.
+
+✨ Timeplus can run complex SQL to join data from multiple MSK topics or even different MSK clusters in same or different regions, or apply lookups with other ClickHouse/MySQL/Postgres tables.
+
+✨ Timeplus supports continuous and incremental stream processing, such as tumble, hop, session windows, watermark and out-of-order processing.`,
+    screenshots: [
+      {
+        desc: "Parquet files in Amazon S3, in Apache Iceberg open format",
+        src: "s3_files.png",
+      },
+      {
+        desc: "Other engines such as Spark can read the Iceberg data written by Timeplus",
+        src: "sparksql.png",
+      },
+    ],
+    steps: [
+      "Create Kafka External Stream in Timeplus to read data from Amazon MSK",
+      "Optionally enable Avro or Protobuf while reading Kafka data",
+      "Explore the Kafka data with ad-hoc SQL without having to create materialized views",
+      "Create Iceberg External Stream to write data in Iceberg open format, using Glue Iceberg REST Catalog",
+      "Create Materialized Views with complex SQL to read multiple MSK topics and send streaming transformed data to Iceberg",
+    ],
+    dataFlowMarkdown: `graph TD;
+        K[Amazon MSK]-->T[Timeplus]-->S3[Amazon S3];
+        T-->Glue[Glue Catalog];
+        T-->S3T[S3 Table Catalog];
+`,
+    sqlExample: `-- read Avro messages from MSK topics
+create external stream msk_stream_read(
+  org_id string,
+  float_value nullable(float32),
+  array_of_records array(tuple(a_str string, a_num int32))
+)
+settings
+    type='kafka',
+    brokers='brokerid.kafka.us-west-2.amazonaws.com:9098',
+    topic='topic2',
+    security_protocol='SASL_SSL',
+    sasl_mechanism='AWS_MSK_IAM',--using IAM role
+    data_format='Avro',
+    format_schema='avro_schema';
+
+-- connect to Iceberg datalake on S3
+create database iceberg
+settings  type='iceberg',
+          catalog_type='rest', catalog_uri='https://glue.us-west-2.amazonaws.com/iceberg',
+          warehouse='..', storage_endpoint='https://tp-iceberg-demo.s3.us-west-2.amazonaws.com',
+          rest_catalog_sigv4_enabled=true, rest_catalog_signing_region='us-west-2', rest_catalog_signing_name='glue';
+create stream iceberg.transformed(
+  timestamp datetime64,
+  org_id string,
+  float_value float,
+  array_length int,
+  max_num int,
+  min_num int
+);
+
+create materialized view mv_write_iceberg into iceberg.transformed
+AS select now() as timestamp, org_id,float_value, length(array_of_records.a_num) as array_length,
+array_max(array_of_records.a_num) as max_num,array_min(array_of_records.a_num) as min_num
+from msk_stream_read
+settings s3_min_upload_file_size=1024;
+`,
+    youtubeVideoLink:
+      "https://www.youtube.com/embed/2m6ehwmzOnc?si=QMRqKYMzSZCO2VyK",
+    demoLinks: [
+      {
+        title: "🔒 Book a Demo",
+        url: "https://www.timeplus.com/contact",
+        description: "Contact us to schedule a live demo",
       },
     ],
   },
