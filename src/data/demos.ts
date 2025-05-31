@@ -570,9 +570,9 @@ FROM returns
     demoLinks: [
       {
         title: "Live Demo in Timeplus",
-        url: "https://demo.timeplus.cloud/ksql-alt/console/",
+        url: "https://play.demo.timeplus.com/default/console/dashboard/e4436486-0503-4265-93b8-300354ea6568",
         icon: "timeplus_logo.svg",
-        description: "Login with SSO, choose market-data demo workspace",
+        description: "",
       },
       {
         title:
