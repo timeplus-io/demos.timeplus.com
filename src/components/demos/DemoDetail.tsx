@@ -23,10 +23,9 @@ const DemoDetail: React.FC<DemoDetailProps> = ({
   onTagClick = () => {},
 }) => {
   const [isFullScreen, setIsFullScreen] = React.useState(false);
-  const [selectedScreenshot, setSelectedScreenshot] = React.useState<{
-    desc: string;
-    src: string;
-  } | null>(null);
+  const [selectedScreenshotIndex, setSelectedScreenshotIndex] = React.useState<
+    number | null
+  >(null);
 
   React.useEffect(() => {
     mermaid.init(
@@ -35,8 +34,8 @@ const DemoDetail: React.FC<DemoDetailProps> = ({
     );
   }, [demo.dataFlowMarkdown]);
 
-  const handleScreenshotClick = (screenshot: { desc: string; src: string }) => {
-    setSelectedScreenshot(screenshot);
+  const handleScreenshotClick = (index: number) => {
+    setSelectedScreenshotIndex(index);
     setIsFullScreen(true);
   };
   return (
@@ -125,7 +124,7 @@ hover:bg-timeplus-gray-100 hover:text-white cursor-pointer" // <-- Updated this 
                     className="w-full h-48 object-cover rounded-lg cursor-pointer hover:opacity-80
 transition-opacity"
                     onClick={() => {
-                      handleScreenshotClick(screenshot);
+                      handleScreenshotClick(index);
                     }}
                   />
                   <div
@@ -137,28 +136,145 @@ rounded-b-lg opacity-0 group-hover:opacity-100 transition-opacity"
                 </div>
               ))}
             </div>
-            {isFullScreen && selectedScreenshot && (
-              <div
-                className="fixed inset-0 bg-black bg-opacity-90 z-50 flex items-center justify-center"
-                onClick={() => setIsFullScreen(false)}
-              >
-                <img
-                  src={`screenshots/${demo.id}/${selectedScreenshot.src.split("/").pop()}`}
-                  alt={selectedScreenshot.desc}
-                  className="max-w-[90%] max-h-[90%] object-contain"
-                />
-                <button
-                  onClick={() => setIsFullScreen(false)}
-                  className="absolute top-4 right-4 text-white bg-timeplus-gray-200 rounded-full w-8 h-8 flex
-items-center justify-center"
-                >
-                  ✖️
-                </button>
-                <div className="absolute bottom-4 left-0 right-0 text-center text-white px-4">
-                  {selectedScreenshot.desc}
-                </div>
-              </div>
-            )}
+            {isFullScreen &&
+              selectedScreenshotIndex !== null &&
+              demo.screenshots &&
+              demo.screenshots[selectedScreenshotIndex] &&
+              (() => {
+                const currentScreenshot =
+                  demo.screenshots[selectedScreenshotIndex];
+                const totalScreenshots = demo.screenshots.length;
+
+                const handlePrev = (e: React.MouseEvent) => {
+                  e.stopPropagation();
+                  setSelectedScreenshotIndex((prevIndex) =>
+                    prevIndex !== null
+                      ? (prevIndex - 1 + totalScreenshots) % totalScreenshots
+                      : null,
+                  );
+                };
+
+                const handleNext = (e: React.MouseEvent) => {
+                  e.stopPropagation();
+                  setSelectedScreenshotIndex((prevIndex) =>
+                    prevIndex !== null
+                      ? (prevIndex + 1) % totalScreenshots
+                      : null,
+                  );
+                };
+
+                const handleClose = (e?: React.MouseEvent) => {
+                  if (e) e.stopPropagation();
+                  setIsFullScreen(false);
+                };
+
+                return (
+                  <div
+                    className="fixed inset-0 bg-black bg-opacity-90 z-50 flex items-center justify-center"
+                    onClick={handleClose} // Click on backdrop closes modal
+                  >
+                    <div
+                      className="relative flex flex-col items-center justify-center w-full h-full
+max-w-[95vw] max-h-[95vh] p-1 sm:p-4"
+                      onClick={(e) => e.stopPropagation()} // Prevent click inside content from closing modal
+                    >
+                      {/* Image and its description container */}
+                      <div
+                        className="flex flex-col items-center justify-center flex-grow w-full h-auto
+overflow-hidden"
+                      >
+                        <img
+                          src={`screenshots/${demo.id}/${currentScreenshot.src}`}
+                          alt={currentScreenshot.desc}
+                          className="object-contain max-w-full max-h-full"
+                        />
+                      </div>
+                      {currentScreenshot.desc && (
+                        <div
+                          className="mt-2 text-center text-white text-xs sm:text-sm px-3 py-1 bg-black
+bg-opacity-60 rounded"
+                        >
+                          {currentScreenshot.desc}
+                        </div>
+                      )}
+
+                      {/* Previous Button */}
+                      {totalScreenshots > 1 && (
+                        <button
+                          onClick={handlePrev}
+                          className="absolute left-0 sm:left-2 top-1/2 transform -translate-y-1/2 text-white
+bg-black bg-opacity-30 hover:bg-opacity-60 rounded-full p-2 sm:p-3 transition-all"
+                          aria-label="Previous image"
+                        >
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            strokeWidth={2}
+                            stroke="currentColor"
+                            className="w-5 h-5 sm:w-6 sm:h-6"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              d="M15.75 19.5L8.25
+12l7.5-7.5"
+                            />
+                          </svg>
+                        </button>
+                      )}
+
+                      {/* Next Button */}
+                      {totalScreenshots > 1 && (
+                        <button
+                          onClick={handleNext}
+                          className="absolute right-0 sm:right-2 top-1/2 transform -translate-y-1/2
+text-white bg-black bg-opacity-30 hover:bg-opacity-60 rounded-full p-2 sm:p-3 transition-all"
+                          aria-label="Next image"
+                        >
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            strokeWidth={2}
+                            stroke="currentColor"
+                            className="w-5 h-5 sm:w-6 sm:h-6"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              d="M8.25 4.5l7.5 7.5-7.5 7.5"
+                            />
+                          </svg>
+                        </button>
+                      )}
+
+                      {/* Close Button (top right corner) */}
+                      <button
+                        onClick={handleClose}
+                        className="absolute top-0 right-0 sm:top-1 sm:right-1 text-white bg-black
+bg-opacity-30 hover:bg-opacity-60 rounded-full p-2 sm:p-3 transition-all"
+                        aria-label="Close"
+                      >
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                          strokeWidth={2}
+                          stroke="currentColor"
+                          className="w-5 h-5 sm:w-6 sm:h-6"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            d="M6 18L18 6M6 6l12 12"
+                          />
+                        </svg>
+                      </button>
+                    </div>
+                  </div>
+                );
+              })()}
           </div>
         )}
 
