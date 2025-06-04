@@ -28,7 +28,7 @@ export const demos: Demo[] = [
     title: "OLTP to OLAP",
     subtitle:
       "Denormalize N+1 records in MySQL to a JSON doc, and Save in S3/GCS.",
-    category: "Pipeline",
+    category: "Real-time Analytics",
     keywords: ["cdc", "debezium", "kafka", "pipeline", "s3", "oltp", "olap"],
     coverImage: "cdc_cover.png",
     introduction: `A common practice in OLTP database design is normalization. For instance, processing a customer order with multiple line items typically involves inserting one row into an "orders" table and multiple rows into an "order_details" table, linked by an "orderNumber".
@@ -244,8 +244,8 @@ as select raw as event from o11y.otlp_metrics;
     id: "ksql_alternative",
     title: "ksqlDB Alternative",
     subtitle: "Timeplus offers additional benefits compared to ksqlDB.",
-    category: "Stream Processing",
-    keywords: ["kafka", "sql", "database"],
+    category: "Real-time Analytics",
+    keywords: ["kafka", "sql", "pipeline", "database"],
     coverImage: "ksql_cover.png",
     introduction: `[ksqlDB](https://www.confluent.io/product/ksqldb/), a stream processing engine by Confluent, is primarily designed for consuming data from Apache Kafka topics, performing stateless or stateful transformations, and writing results back to Kafka. For comprehensive analytical querying, data typically needs to be offloaded to specialized downstream systems. While ksqlDB offers some capabilities for querying derived state (e.g., materialized views), these ad-hoc queries are generally restricted to primary key lookups or simple range scans.`,
     challenges: `1️⃣ **Limited Ad-Hoc Querying and Join Capabilities:** ksqlDB's query capabilities fall short of those offered by traditional databases or data warehouses, primarily supporting key-based lookups and range scans. Its JOIN operations are also restricted, often limited to primary key relationships.
@@ -324,8 +324,8 @@ AND to_time(c.time) >= to_time(b.time);
     title: "Kafka To ClickHouse",
     subtitle:
       "Query data in Kafka with SQL, apply join and lookup and send high quality data to ClickHouse.",
-    category: "Pipeline",
-    keywords: ["kafka", "sql", "clickhouse", "streaming", "join"],
+    category: "Real-time Analytics",
+    keywords: ["kafka", "sql", "clickhouse", "pipeline", "streaming", "join"],
     coverImage: "kafak2ch_cover.png",
     introduction: `Apache Kafka is a prevalent source for real-time data streams. While OLAP databases like ClickHouse offer Kafka consumption capabilities, they often come with certain limitations. Timeplus offers a high-performance and flexible solution for querying data directly within Kafka, performing complex joins with other data sources, and delivering transformed, high-quality data to destinations such as ClickHouse or other analytical systems.`,
     challenges: `1️⃣ **Indirect Kafka Data Access in ClickHouse:** ClickHouse's KafkaEngine allows integration with Kafka, but direct querying of KafkaEngine tables is not supported. Users must create Materialized Views to access and process Kafka data, which can hinder interactive data exploration and iterative query development.
@@ -416,8 +416,8 @@ inner join dim_code_to_status using (code);`,
     title: "MSK To Iceberg",
     subtitle:
       "Query data in Amazon Managed Streaming for Apache Kafka (MSK) with SQL, apply join and lookup and save high quality data in Apache Iceberg, for low cost storage and multi-engine queries.",
-    category: "Pipeline",
-    keywords: ["kafka", "sql", "aws", "msk", "iceberg", "etl"],
+    category: "Real-time Analytics",
+    keywords: ["kafka", "sql", "aws", "pipeline", "msk", "iceberg", "etl"],
     coverImage: "msk2iceberg_cover.png",
     introduction: `Apache Kafka serves as a ubiquitous source for real-time data streams, and Amazon MSK (Managed Streaming for Apache Kafka) provides a fully managed Kafka service on AWS. While data within Kafka can be queried using frameworks like Apache Flink or Apache Spark, these solutions often entail significant operational overhead and cost. Timeplus presents a high-performance, flexible alternative for processing data directly from MSK, enabling the transformation and delivery of high-quality, structured data to Amazon S3 in the Apache Iceberg open table format.`,
     challenges: `1️⃣ **Kafka's Design Limitations for Analytics:** Apache Kafka excels as a message bus for inter-service communication and data transport (supporting formats like JSON, Avro, Protobuf, and binary). However, it is not inherently designed for direct analytical workloads. Storing large datasets in Kafka long-term is costly, and Kafka lacks native indexing capabilities to optimize data scanning for analytical queries. Consequently, a common pattern involves processing data from Kafka and landing it into OLAP databases or data lakes, such as those utilizing the Apache Iceberg format.
@@ -507,7 +507,7 @@ settings s3_min_upload_file_size=1024;
     title: "Crypto Market Data",
     subtitle:
       "Get real-time data from blockchain, monitor millions of token pairs and deliver insights in subsecond latency.",
-    category: "Stream Processing",
+    category: "Real-time Analytics",
     keywords: ["bitcoin", "blockchain", "trading", "streaming"],
     coverImage: "bitcoin_cover.png",
     introduction: `The cryptocurrency ecosystem is characterized by the generation of high-volume, high-velocity, and frequently mutable data. Timeplus facilitates the ingestion of real-time market data through various mechanisms, including WebSockets, HTTP Streams, or API push notifications, enabling the construction of sophisticated data pipelines for deriving immediate insights.`,
