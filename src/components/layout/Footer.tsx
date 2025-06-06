@@ -11,11 +11,17 @@ const Footer: React.FC = () => {
             </p>
           </div>
           <div className="flex space-x-6">
-            <a href="https://twitter.com/timeplusdata" className="text-timeplus-gray-100 hover:text-white transition-colors">
-              Twitter
+            <a href="https://timeplus.com/slack" className="text-timeplus-gray-100 hover:text-white transition-colors">
+              Slack
             </a>
             <a href="https://github.com/timeplus-io" className="text-timeplus-gray-100 hover:text-white transition-colors">
               GitHub
+            </a>
+            <a href="https://twitter.com/timeplusdata" className="text-timeplus-gray-100 hover:text-white transition-colors">
+              X/Twitter
+            </a>
+            <a href="https://www.youtube.com/@timeplusdata" className="text-timeplus-gray-100 hover:text-white transition-colors">
+              Youtube
             </a>
             <a href="https://linkedin.com/company/timeplusinc" className="text-timeplus-gray-100 hover:text-white transition-colors">
               LinkedIn

@@ -55,7 +55,7 @@ const TagFilteredGridRouteComponent: React.FC<
     <>
       <div className="mb-12 text-center">
         <h1 className="text-4xl md:text-5xl font-bold mb-4">
-          Timeplus Product Demos
+          See Timeplus in Action
         </h1>
         <p className="text-timeplus-gray-100 text-lg md:text-xl max-w-3xl mx-auto">
           Explore our interactive demos showcasing real-time data processing,
@@ -93,7 +93,7 @@ const TagFilteredGridRouteComponent: React.FC<
       </div>
       {decodedTag && (
         <div className="mb-4 flex items-center">
-          Filtering by tag:{" "}
+          Showing demos related to:{" "}
           <span
             className="font-bold p-1 bg-timeplus-pink text-white rounded
 mx-2"

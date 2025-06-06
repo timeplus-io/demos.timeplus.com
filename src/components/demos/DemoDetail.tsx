@@ -106,7 +106,7 @@ hover:bg-timeplus-gray-100 hover:text-white cursor-pointer" // <-- Updated this 
         </div>
 
         <div className="mb-8">
-          <h2 className="text-2xl font-bold text-white mb-4">Solution</h2>
+          <h2 className="text-2xl font-semibold text-white mb-4">Solution</h2>
           <div className="text-timeplus-gray-100 prose prose-invert max-w-none markdown-content">
             <ReactMarkdown>{demo.solution}</ReactMarkdown>
           </div>
@@ -114,7 +114,7 @@ hover:bg-timeplus-gray-100 hover:text-white cursor-pointer" // <-- Updated this 
 
         {demo.screenshots && demo.screenshots.length > 0 && (
           <div className="mb-8">
-            <h2 className="text-2xl font-bold text-white mb-4">Screenshots</h2>
+            <h2 className="text-2xl font-semibold text-white mb-4">Screenshots</h2>
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
               {demo.screenshots.map((screenshot, index) => (
                 <div key={index} className="relative group">
@@ -279,7 +279,7 @@ bg-opacity-30 hover:bg-opacity-60 rounded-full p-2 sm:p-3 transition-all"
         )}
 
         <div className="mb-8">
-          <h2 className="text-2xl font-bold text-white mb-4">Key Steps</h2>
+          <h2 className="text-2xl font-semibold text-white mb-4">Key Steps</h2>
           <ol className="list-decimal pl-5 space-y-2">
             {demo.steps.map((step, index) => (
               <li key={index} className="text-timeplus-gray-100">
@@ -290,7 +290,7 @@ bg-opacity-30 hover:bg-opacity-60 rounded-full p-2 sm:p-3 transition-all"
         </div>
 
         <div className="mb-8">
-          <h2 className="text-2xl font-bold text-white mb-4">Data Flow</h2>
+          <h2 className="text-2xl font-semibold text-white mb-4">Data Flow</h2>
           <div className="w-full max-h-196 overflow-hidden rounded-lg bg-timeplus-gray-200">
             {demo.dataFlowImage ? (
               <img
@@ -318,7 +318,7 @@ bg-opacity-30 hover:bg-opacity-60 rounded-full p-2 sm:p-3 transition-all"
         </div>
 
         <div className="mb-8">
-          <h2 className="text-2xl font-bold text-white mb-4">SQL Example</h2>
+          <h2 className="text-2xl font-semibold text-white mb-4">SQL Example</h2>
           <div className="bg-timeplus-gray-200 rounded-lg overflow-x-auto text-sm">
             <SyntaxHighlighter
               language="sql"
@@ -334,7 +334,7 @@ bg-opacity-30 hover:bg-opacity-60 rounded-full p-2 sm:p-3 transition-all"
 
         {demo.youtubeVideoLink && (
           <div className="mb-8">
-            <h2 className="text-2xl font-bold text-white mb-4">Demo Video</h2>
+            <h2 className="text-2xl font-semibold text-white mb-4">Demo Video</h2>
             <div
               className="relative"
               style={{ paddingBottom: "56.25%", height: 0, overflow: "hidden" }}
@@ -351,7 +351,7 @@ bg-opacity-30 hover:bg-opacity-60 rounded-full p-2 sm:p-3 transition-all"
         )}
 
         <div>
-          <h2 className="text-2xl font-bold text-white mb-4">Demo Links</h2>
+          <h2 className="text-2xl font-semibold text-white mb-4">Demo Links</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {demo.demoLinks.map((link, index) => (
               <a
@@ -368,7 +368,7 @@ bg-opacity-30 hover:bg-opacity-60 rounded-full p-2 sm:p-3 transition-all"
                   (e.currentTarget.style.backgroundColor = "#2D3748")
                 }
               >
-                <h3 className="text-lg font-bold text-white mb-2 flex items-center">
+                <h3 className="text-lg font-semibold text-white mb-2 flex items-center">
                   {link.icon && (
                     <img src={link.icon} className="w-5 h-5 mr-2" />
                   )}
