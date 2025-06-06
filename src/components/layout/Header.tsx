@@ -27,7 +27,13 @@ const Header: React.FC = () => {
             href="https://docs.timeplus.com"
             className="text-timeplus-gray-100 hover:text-white transition-colors"
           >
-            Documentation
+            Docs
+          </a>
+          <a
+            href="https://timeplus.com/slack"
+            className="text-timeplus-gray-100 hover:text-white transition-colors"
+          >
+            Join Slack
           </a>
           <a
             href="https://timeplus.com/contact"

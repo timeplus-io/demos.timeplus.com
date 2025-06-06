@@ -29,7 +29,7 @@ border-timeplus-gray-200 hover:shadow-lg transition-all duration-300 flex flex-c
       <div className="p-5 flex flex-col flex-grow">
         <div className="flex items-center mb-2">
           {" "}
-          <h3 className="text-xl font-bold text-white">{demo.title}</h3>
+          <h3 className="text-xl font-semibold text-white">{demo.title}</h3>
           <span className="ml-2 px-2 py-0.5 text-xs font-medium rounded-full bg-timeplus-gradient text-white">
             {demo.category}
           </span>
