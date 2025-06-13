@@ -20,6 +20,7 @@ export interface Demo {
     icon?: string;
     description?: string;
   }[];
+  rank?: number;
 }
 
 export const demos: Demo[] = [
@@ -143,6 +144,7 @@ group by window_start,orderNumber;`,
           "Login with demo/demo123. Check data lineage for retailer_etl namespace",
       },
     ],
+    rank: 10,
   },
   {
     id: "opentelemetry",
@@ -239,6 +241,7 @@ as select raw as event from o11y.otlp_metrics;
           "Login with demo/de1237!Mo, run the default query to match all events",
       },
     ],
+    rank: 20,
   },
   {
     id: "ksql_alternative",
@@ -318,6 +321,7 @@ AND to_time(c.time) >= to_time(b.time);
         description: "White paper to compare those 2 products",
       },
     ],
+    rank: 30,
   },
   {
     id: "kafka2ch",
@@ -410,6 +414,7 @@ inner join dim_code_to_status using (code);`,
           "Timeplus complements ClickHouse by providing better Kafka integration and robust stream processing capabilities",
       },
     ],
+    rank: 40,
   },
   {
     id: "msk2iceberg",
@@ -501,6 +506,7 @@ settings s3_min_upload_file_size=1024;
         description: "Contact us to schedule a live demo",
       },
     ],
+    rank: 50,
   },
   {
     id: "marketdata",
@@ -581,5 +587,87 @@ FROM returns
         description: "Customer story",
       },
     ],
+    rank: 60,
+  },
+  {
+    id: "github",
+    title: "GitHub Events",
+    subtitle:
+      "Get real-time data from GitHub, monitor millions of events to gain real-time insights.",
+    category: "Real-Time Analytics",
+    keywords: ["kafka", "json", "mv"],
+    coverImage: "github_cover.png",
+    introduction: `Imagine you have millions of GitHub events, such as commits, pull requests, issues, and releases, streaming in real-time. You want to monitor these events to gain insights into rising new projects, popular projects, and developer contributions. Querying them directly from Apache Kafka can be challenging due to the complexity of the data and the need for efficient processing. Timeplus provides a solution to this problem by allowing you to create materialized views that can process and analyze these events in real-time, enabling you to gain valuable insights quickly.`,
+    challenges: `1️⃣ **Storage and Compute Costs:** Storing voluminous and complex JSON documents in Kafka and subsequently in OLAP data warehouses can lead to substantial storage and computational costs.
+
+2️⃣ **Complex Data Structures:** The GitHub schema, while open and flexible, often results in verbose JSON documents with complex, nested structures, potentially spanning hundreds of lines per message. Parsing and filtering these documents efficiently and accurately presents a significant challenge.
+
+3️⃣ **Continuous and Incremental Analytics Demand:** In contrast to batch ETL and traditional BI, Timeplus supports continuous and incremental processing. Critical use cases include real-time event tracking, live aggregation of event data, and immediate anomaly or fraud detection.`,
+    solution:
+      "Timeplus seamlessly connects with Kafka API and read incoming and existing messages. You can run SQL query directly via the Kafka External Stream without saving any data in Timeplus. To avoid the high cost of storing billions of events in Kafka and also to improve the query performance, it's recommended to create Materialized Views in Timeplus to save Kafka message locally and apply optimized columar storage or index. Materialized Views also enable incremental updates to turn BI reports from minutes to sub-seconds.",
+    screenshots: [
+      {
+        desc: "Millions of GitHub events in Kafka",
+        src: "event.png",
+      },
+      {
+        desc: "Real-Time GitHub Monitoring",
+        src: "dashboard.png",
+      },
+    ],
+    steps: [
+      "Call GitHub API to get real-time events and push to Kafka",
+      "Create External Stream in Timeplus to read data from Kafka",
+      "Create Materialized Views to process and analyze the data",
+      "Create real-time alerts or visualization in Timeplus or Grafana",
+    ],
+    dataFlowMarkdown: `graph TD;
+        G[GitHub API]-->K[Kafka];
+        subgraph Timeplus
+        MV[Materialized View]-->T[Kafka External Stream];
+        end
+        T-->K;
+        Grafana-->MV;
+`,
+    sqlExample: `create external stream github_events(
+  actor string,
+  created_at string,
+  id string,
+  payload string,
+  repo string,
+  type string
+)
+SETTINGS type = 'kafka', brokers = 'kafkaproxynoauth.us-west1-a.c.tpdemo2025.internal:9092',
+topic = 'github_events', security_protocol = 'PLAINTEXT', data_format = 'JSONEachRow',
+skip_ssl_cert_check = false, one_message_per_row = true;
+
+create materialized view mv_github_events as(
+  select _tp_time,actor,created_at::datetime as created_at,id,payload,repo,type
+  from github_events settings seek_to='earliest');
+
+select repo, count(distinct actor) as new_followers
+from table(mv_github_events) where type ='WatchEvent' and _tp_time>now()-1d
+group by repo order by new_followers desc
+limit 5;`,
+    demoLinks: [
+      {
+        title: "Kafka UI",
+        url: "http://kafka.demo.timeplus.com:8080/topics/github_events",
+        icon: "apachekafka_white.png",
+        description: "View raw Kafka topics and messages",
+      },
+      {
+        title: "Live Demo in Timeplus",
+        url: "https://play.demo.timeplus.com/default/console/dashboard/7b553ed7-c29f-49ee-aa6c-ac95e371059c",
+        icon: "timeplus_logo.svg",
+        description: "",
+      },
+      {
+        title: "📝 Build Real-Time Analytics for GitHub",
+        url: "https://www.timeplus.com/post/github-real-time-app",
+        description: "Tutorial",
+      },
+    ],
+    rank: 55,
   },
 ];

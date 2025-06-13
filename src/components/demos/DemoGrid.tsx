@@ -19,8 +19,14 @@ const DemoGrid: React.FC<DemoGridProps> = ({
   selectedTag,
   onTagClick,
 }) => {
-  // Filter demos based on category and search query
-  const filteredDemos = demos.filter((demo) => {
+  // Sort demos by rank, handling undefined ranks
+  const sortedDemos = [...demos].sort((a, b) => {
+    const rankA = a.rank ?? Infinity;
+    const rankB = b.rank ?? Infinity;
+    return rankA - rankB;
+  });
+  // Filter demos based on category, search query and tags
+  const filteredDemos = sortedDemos.filter((demo) => {
     const matchesCategory =
       !selectedCategory || demo.category === selectedCategory;
     const matchesSearch =
