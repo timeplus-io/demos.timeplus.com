@@ -663,6 +663,11 @@ limit 5;`,
         description: "",
       },
       {
+        title: "🐍 Python Notebook",
+        url: "https://marimo.demo.timeplus.com/github/",
+        description: "",
+      },
+      {
         title: "📝 Build Real-Time Analytics for GitHub",
         url: "https://www.timeplus.com/post/github-real-time-app",
         description: "Tutorial",
