@@ -611,8 +611,12 @@ FROM returns
         src: "event.png",
       },
       {
-        desc: "Real-Time GitHub Monitoring",
+        desc: "Real-Time GitHub Monitoring with Timeplus UI",
         src: "dashboard.png",
+      },
+      {
+        desc: "Real-Time GitHub Monitoring with Timeplus SQL and Python Notebook",
+        src: "notebook.png",
       },
     ],
     steps: [
