@@ -641,9 +641,9 @@ FROM returns
   repo string,
   type string
 )
-SETTINGS type = 'kafka', brokers = 'kafkaproxynoauth.us-west1-a.c.tpdemo2025.internal:9092',
-topic = 'github_events', security_protocol = 'PLAINTEXT', data_format = 'JSONEachRow',
-skip_ssl_cert_check = false, one_message_per_row = true;
+settings type = 'kafka', brokers = 'kafka.demo.timeplus.com:9092',
+topic = 'github_events', sasl_mechanism = 'PLAIN', username = 'demo', password = 'demo123', security_protocol = 'SASL_SSL',
+skip_ssl_cert_check = true, data_format = 'JSONEachRow', one_message_per_row = true;
 
 create materialized view mv_github_events as(
   select _tp_time,actor,created_at::datetime as created_at,id,payload,repo,type
@@ -669,6 +669,11 @@ limit 5;`,
       {
         title: "🐍 Python Notebook",
         url: "https://marimo.demo.timeplus.com/github/",
+        description: "",
+      },
+      {
+        title: "🐍 Python Notebook Source Code",
+        url: "https://github.com/timeplus-io/marimo.demo.timeplus.com/blob/main/notebooks/github.py",
         description: "",
       },
       {
