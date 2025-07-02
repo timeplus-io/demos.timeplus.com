@@ -143,6 +143,12 @@ group by window_start,orderNumber;`,
         description:
           "Login with demo/demo123. Check data lineage for retailer_etl namespace",
       },
+      {
+        title: "📝 Customer Story",
+        url: "https://www.timeplus.com/post/customer-story-salla",
+        description:
+          "How Salla Optimized MySQL-to-ClickHouse CDC Pipeline with Timeplus",
+      },
     ],
     rank: 10,
   },
@@ -257,7 +263,7 @@ as select raw as event from o11y.otlp_metrics;
 
 3️⃣ **State Management Complexity:** Managing ksqlDB state stores can be challenging due to limitations in Time-To-Live (TTL) configurations and other storage settings. State persistence, often reliant on Kafka topics, can lead to increased storage and network bandwidth requirements for achieving high availability and resilience.`,
     solution:
-      "Timeplus is designed from the ground up in C++ based on database technology (Clickhouse in this case) but extended for Stream Processing. It leverages Clickhouse libraries and data structures under the hood in its process for extremely fast database operations such as filtering, projection, and aggregations.\n\n&nbsp;\n\nFor stream processing, it has created a native stream data structure as a first class citizen which does not require any coupling  with Apache Kafka although it can integrate with it if required. This allows for a much simpler and more performant system for data ingestion, processing and analytics all in one single binary. Data products created within Timeplus can be pushed out to external systems via Streaming or or consumed via Ad-hoc querying. As such it can easily integrate into the wider ecosystem of systems that integrate with Apache Kafka or Database/BI Tools.",
+      "Timeplus is designed from the ground up in C++ based on database technology (ClickHouse in this case) but extended for Stream Processing. It leverages ClickHouse libraries and data structures under the hood in its process for extremely fast database operations such as filtering, projection, and aggregations.\n\n&nbsp;\n\nFor stream processing, it has created a native stream data structure as a first class citizen which does not require any coupling  with Apache Kafka although it can integrate with it if required. This allows for a much simpler and more performant system for data ingestion, processing and analytics all in one single binary. Data products created within Timeplus can be pushed out to external systems via Streaming or or consumed via Ad-hoc querying. As such it can easily integrate into the wider ecosystem of systems that integrate with Apache Kafka or Database/BI Tools.",
     screenshots: [
       { desc: "Comparing Timeplus and ksqlDB", src: "dashboards.png" },
     ],
@@ -282,10 +288,11 @@ as select raw as event from o11y.otlp_metrics;
     response map(string, int),
     headers map(string, string)
 )
-SETTINGS
-type = 'kafka',
-brokers = 'kafka.demo-internal:9092',
-topic = 'owlshop-frontend-events';
+SETTINGS type = 'kafka', brokers = 'kafka.demo.timeplus.com:9092',
+topic = 'owlshop-frontend-events', sasl_mechanism = 'PLAIN',
+username = 'demo', password = 'demo123', security_protocol = 'SASL_SSL',
+skip_ssl_cert_check = true;
+;
 
 -- self JOIN, which is not available in ksqlDB
 SELECT
@@ -581,10 +588,10 @@ FROM returns
         description: "",
       },
       {
-        title:
-          "📝 How Zyre Leverages Timeplus for Real-Time Blockchain Analytics at Scale",
+        title: "📝 Customer Story",
         url: "https://www.timeplus.com/post/customer-story-zyre",
-        description: "Customer story",
+        description:
+          "How Zyre Leverages Timeplus for Real-Time Blockchain Analytics at Scale",
       },
     ],
     rank: 60,
