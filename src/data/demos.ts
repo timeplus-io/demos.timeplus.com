@@ -119,6 +119,7 @@ with enriched_orderdetails as (
   from details inner join orders
   on (details.orderNumber = orders.orderNumber)
   and date_diff_within(10s)
+  settings join_max_buffered_bytes=2524288000
 )
 select orderNumber,any(customerNumber) as customerNumber,
         any(orderDate) as orderDate,any(status) as status,
