@@ -829,7 +829,7 @@ CREATE OR REPLACE AGGREGATE FUNCTION cep_simple_pattern(time datetime64(3), even
       },
       {
         title: "📝 CEP Technical Deep Dive",
-        url: "https://www.timeplus.com/post/customer-story-zyre",
+        url: "https://www.timeplus.com/post/cep-with-streaming-sql-udf",
         description: "How to Build CEP Applications with Timeplus",
       },
       {
