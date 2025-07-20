@@ -706,7 +706,7 @@ limit 5;`,
 
 CEP systems can detect temporal patterns such as:
 
-• sequences – "A followed by B within 10 minutes"
+• sequences – "Event A followed by B then C within 10 minutes"
 
 • spatial relationships – "events occurring in the same geographic region"
 

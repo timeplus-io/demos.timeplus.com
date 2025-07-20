@@ -24,6 +24,12 @@
                 line-height: 1.6;
             }
 
+            a {
+                color: white;
+                text-decoration: none;
+                transition: color 0.3s ease;
+            }
+
             .page {
                 width: 100vw;
                 height: 100vh;
@@ -191,7 +197,7 @@
                 font-size: clamp(2.5rem, 6vw, 4rem);
                 font-weight: 900;
                 color: #b275ff;
-                margin: 1rem 0;
+                margin: 0.2rem 0;
             }
 
             .pattern-list {
@@ -209,7 +215,7 @@
                 background: #2f2d32;
                 border-radius: 16px;
                 padding: 2rem;
-                margin: 1.5rem 0;
+                margin: 0.5rem 0;
                 width: 100%;
                 max-width: 800px;
                 border: 2px solid #42186d;
@@ -242,7 +248,7 @@
                 background: #2f2d32;
                 border-radius: 12px;
                 padding: 1.5rem;
-                margin: 1rem 0;
+                margin: 0.2rem 0;
                 border: 1px solid #42186d;
             }
 
@@ -285,18 +291,17 @@
                 class="code-block"
                 style="background: rgba(0, 0, 0, 0.3); border: 2px solid white"
             >
-                <code>
-                    SELECT userId, count(DISTINCT location) as locations,<br />
-                    &nbsp;&nbsp;sum(amount) as total<br />
-                    FROM hop(transactions, 5s, 10m)<br />
-                    GROUP BY window_start, userId<br />
-                    HAVING locations > 1 AND total > 1000
+                <code
+                    >SELECT userId, count(DISTINCT location) as locations,
+                    sum(amount) as total FROM hop(transactions, 5s, 10m)<br />
+                    GROUP BY window_start, userId HAVING locations > 1 AND total
+                    > 1000
                 </code>
             </div>
             <p style="font-size: clamp(1.2rem, 3vw, 1.6rem)">
                 <strong>That's it!</strong> No complex syntax. Just SQL.
             </p>
-            <div class="logo">Timeplus</div>
+             <div class="logo"><img src=https://timeplus.io/Option3_W.png width="120"></div>
         </div>
 
         <!-- Page 2: What is CEP + Pain Points -->
@@ -306,22 +311,33 @@
                 <span class="gradient-text">Complex Event Processing?</span>
             </h2>
             <p>
-                CEP detects patterns across multiple data streams in real-time
+                CEP enables real-time analysis and detection of patterns,
+                relationships, and trends across multiple streams of data
+                events.
             </p>
 
-            <div style="margin: 2rem 0">
+            <div style="margin: 1rem 0">
                 <p
                     style="
                         font-size: clamp(1.3rem, 3.5vw, 1.8rem);
-                        margin-bottom: 2rem;
+                        margin-bottom: 1rem;
                     "
                 >
                     📊 Common Patterns:
                 </p>
                 <div class="pattern-list">
-                    <p>• "A followed by B within 10 minutes" 🔄</p>
-                    <p>• "100+ transactions/second from same user" ⚡</p>
-                    <p>• "Events in same geographic region" 📍</p>
+                    <p>
+                        • sequences – Event A followed by B then C within 10
+                        minutes 🔄
+                    </p>
+                    <p>
+                        • spatial relationships – 100+ transactions/second from
+                        same user ⚡
+                    </p>
+                    <p>
+                        • statistical patterns – Events in same geographic
+                        region 📍
+                    </p>
                 </div>
             </div>
 
@@ -330,64 +346,55 @@
                     😫 The Traditional Way (Flink CEP)
                 </h3>
                 <code style="font-size: 0.9rem">
-                    SELECT T.aid, T.bid, T.cid<br />
-                    FROM MyTable<br />
-                    &nbsp;&nbsp;MATCH_RECOGNIZE (<br />
-                    &nbsp;&nbsp;&nbsp;&nbsp;PARTITION BY userid<br />
-                    &nbsp;&nbsp;&nbsp;&nbsp;ORDER BY proctime<br />
-                    &nbsp;&nbsp;&nbsp;&nbsp;MEASURES<br />
-                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;A.id AS aid,<br />
-                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;B.id AS bid,<br />
-                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;C.id AS cid<br />
-                    &nbsp;&nbsp;&nbsp;&nbsp;PATTERN (A B C)<br />
-                    &nbsp;&nbsp;&nbsp;&nbsp;DEFINE<br />
-                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;A AS name = 'a',<br />
-                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;B AS name = 'b',<br />
-                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;C AS name = 'c'<br />
-                    &nbsp;&nbsp;) AS T
+                    SELECT T.aid, T.bid, T.cid FROM MyTable MATCH_RECOGNIZE (
+                    PARTITION BY userid ORDER BY proctime MEASURES A.id AS aid,
+                    B.id AS bid, C.id AS cid PATTERN (A B C) DEFINE A AS name =
+                    'a', B AS name = 'b', C AS name = 'c' ) AS T
                 </code>
             </div>
-            <div class="logo">Timeplus</div>
+            requiring a specialized query language, many known limitations
+              <div class="logo"><img src=https://timeplus.io/Option3_W.png width="120"></div>
         </div>
 
         <!-- Page 3: SQL Solution -->
         <div class="page page-accent">
             <h2>The <span class="gradient-text">Timeplus Way</span></h2>
-            <div class="emoji">✨</div>
-            <h3>Pure SQL-Based CEP</h3>
+            <h3>✨ SQL-Based CEP, with optional JavaScript/Python code</h3>
 
             <div class="code-block">
                 <code>
-                    -- Detect fraud: multiple locations + high value<br />
                     CREATE MATERIALIZED VIEW fraud_detection AS<br />
                     SELECT userId, count(DISTINCT location) as locations,<br />
-                    &nbsp;&nbsp;sum(amount) as total<br />
-                    FROM hop(transactions, 5s, 10m)<br />
-                    GROUP BY window_start, userId<br />
-                    HAVING locations > 1 AND total > 1000
+                    sum(amount) as total FROM hop(transactions, 5s, 10m) GROUP
+                    BY window_start, userId HAVING locations > 1 AND total >
+                    1000
                 </code>
             </div>
 
             <div class="feature-grid" style="margin-top: 3rem">
                 <div class="feature-card">
                     <div style="font-size: 2rem; margin-bottom: 1rem">⏱️</div>
-                    <strong>Tumbling Windows</strong>
+                    <strong>Tumbling Windows</strong> <br />
+                    Fixed-size, non-overlapping time windows
                 </div>
                 <div class="feature-card">
-                    <div style="font-size: 2rem; margin-bottom: 1rem">🔄</div>
-                    <strong>Hopping Windows</strong>
+                    <div style="font-size: 2rem; margin-bottom: 1rem">🛝</div>
+                    <strong>Hopping Windows</strong> <br />
+                    Overlapping time windows for more frequent updates
                 </div>
                 <div class="feature-card">
-                    <div style="font-size: 2rem; margin-bottom: 1rem">📊</div>
-                    <strong>Session Windows</strong>
+                    <div style="font-size: 2rem; margin-bottom: 1rem">🛒</div>
+                    <strong>Session Windows</strong> <br />
+                    Group events by starting/ending patterns, with inactivity
+                    gaps
                 </div>
             </div>
-            <div class="logo">Timeplus</div>
+              <div class="logo"><img src=https://timeplus.io/Option3_W.png width="120"></div>
         </div>
 
         <!-- Page 4: JavaScript/Python UDF -->
         <div class="page page-dark">
-            <h2>Need More? <span class="gradient-text">UDAFs</span></h2>
+            <h2>Need More? <span class="gradient-text">UDAFs !</span></h2>
             <p>Extend SQL with User-Defined Aggregation Functions</p>
 
             <div
@@ -399,20 +406,14 @@
                 "
             >
                 <div style="font-size: 3rem">🐍 Python</div>
-                <div style="font-size: 3rem">📜 JavaScript</div>
+                <div style="font-size: 3rem">☕ JavaScript</div>
             </div>
 
             <div class="code-block">
                 <code>
-                    -- Pattern matching with JavaScript UDAF<br />
-                    CREATE AGGREGATE FUNCTION detect_pattern<br />
-                    &nbsp;&nbsp;(time datetime, event string)<br />
-                    RETURNS string LANGUAGE JAVASCRIPT AS $$<br />
-                    &nbsp;&nbsp;// Your custom pattern logic<br />
-                    &nbsp;&nbsp;if (events.match(['A', 'B', 'A'])) {<br />
-                    &nbsp;&nbsp;&nbsp;&nbsp;return 'Pattern detected!';<br />
-                    &nbsp;&nbsp;}<br />
-                    $$;<br /><br />
+                    CREATE AGGREGATE FUNCTION detect_pattern(time datetime,
+                    event string) RETURNS string LANGUAGE JAVASCRIPT AS $${<br />
+                    &nbsp;&nbsp;// Your custom pattern logic<br />}$$;<br />
                     SELECT detect_pattern(timestamp, event_type)<br />
                     FROM event_stream;
                 </code>
@@ -422,7 +423,7 @@
                 🎯 <strong>Perfect for:</strong> Custom business logic,
                 proprietary algorithms, complex computations
             </p>
-            <div class="logo">Timeplus</div>
+              <div class="logo"><img src=https://timeplus.io/Option3_W.png width="120"></div>
         </div>
 
         <!-- Page 5: Advanced State Machine -->
@@ -430,29 +431,25 @@
             <h2>Advanced <span class="gradient-text">CEP Patterns</span></h2>
 
             <div class="pattern-example">
-                <h4>1️⃣ Sequence Patterns</h4>
-                <p>Ordered event chains (A→B→A)</p>
+                <h4>1️⃣ Sequence Patterns</h4>Ordered event chains (A→B→A)
             </div>
 
             <div class="pattern-example">
-                <h4>2️⃣ Threshold Patterns</h4>
-                <p>Count-based detection (≥3 A's within 5 seconds)</p>
+                <h4>2️⃣ Threshold Patterns</h4>Count-based detection (≥3 A's within 5 seconds)
             </div>
 
             <div class="pattern-example">
-                <h4>3️⃣ Absence Patterns</h4>
-                <p>Negative logic (A without C occurring)</p>
+                <h4>3️⃣ Absence Patterns</h4>Negative logic (A without C occurring)
             </div>
 
             <div class="pattern-example">
-                <h4>4️⃣ Alternating Patterns</h4>
-                <p>Repeating sequences (A-B-A-B...)</p>
+                <h4>4️⃣ Alternating Patterns</h4>Repeating sequences (A-B-A-B...)
             </div>
 
             <p style="margin-top: 2rem; font-size: clamp(1.2rem, 3vw, 1.6rem)">
-                All achievable with <strong>State Machine UDAFs</strong> 🚀
+                All achievable with <strong>JavaScript/Python UDAFs</strong> 🚀
             </p>
-            <div class="logo">Timeplus</div>
+              <div class="logo"><img src=https://timeplus.io/Option3_W.png width="120"></div>
         </div>
 
         <!-- Page 6: When to Use Each -->
@@ -461,12 +458,12 @@
 
             <div class="solution-card">
                 <div class="solution-header">
-                    <span class="solution-title">📊 SQL Windows</span>
+                    <span class="solution-title">⏱️ SQL without UDAF</span>
                     <span style="color: #164c3f; font-weight: 700">SIMPLE</span>
                 </div>
                 <div class="solution-items">
                     <p>✅ Time-based aggregations</p>
-                    <p>✅ Count/Sum/Avg patterns</p>
+                    <p>✅ Count/Sum/Avg metrics</p>
                     <p>✅ Simple thresholds</p>
                     <p style="color: #737175; font-style: italic">
                         Example: Fraud detection, rate limiting
@@ -477,9 +474,9 @@
             <div class="solution-card">
                 <div class="solution-header">
                     <span class="solution-title"
-                        >🔧 JavaScript/Python UDAF</span
+                        >🔧 SQL with JavaScript/Python UDAF</span
                     >
-                    <span style="color: #97732d; font-weight: 700"
+                    <span style="color: #d53f8c; font-weight: 700"
                         >FLEXIBLE</span
                     >
                 </div>
@@ -487,36 +484,22 @@
                     <p>✅ Custom business logic</p>
                     <p>✅ Complex conditions</p>
                     <p>✅ External libraries</p>
-                    <p style="color: #737175; font-style: italic">
-                        Example: ML scoring, custom algorithms
-                    </p>
-                </div>
-            </div>
-
-            <div class="solution-card">
-                <div class="solution-header">
-                    <span class="solution-title">🎯 State Machine</span>
-                    <span style="color: #d53f8c; font-weight: 700"
-                        >ADVANCED</span
-                    >
-                </div>
-                <div class="solution-items">
                     <p>✅ Multi-step sequences</p>
-                    <p>✅ Long-running patterns</p>
                     <p>✅ Complex state tracking</p>
                     <p style="color: #737175; font-style: italic">
-                        Example: Order lifecycle, IoT monitoring
+                        Example: ML scoring, custom algorithms, Order lifecycle,
+                        IoT monitoring
                     </p>
                 </div>
             </div>
-            <div class="logo">Timeplus</div>
+              <div class="logo"><img src=https://timeplus.io/Option3_W.png width="120"></div>
         </div>
 
         <!-- Page 7: Results & CTA -->
         <div class="page page-1">
             <h2>Ready to simplify your CEP?</h2>
-
-            <div style="margin: 2rem 0">
+<!--
+            <div style="margin: 1rem 0">
                 <div class="success-metric">10x</div>
                 <p>Faster implementation than traditional CEP</p>
 
@@ -525,9 +508,9 @@
 
                 <div class="success-metric">1M+</div>
                 <p>Events per second processed</p>
-            </div>
+            </div> -->
 
-            <h3 style="color: white; margin-top: 2rem; margin-bottom: 1.5rem">
+            <h3 style="color: white; margin-top: 1rem; margin-bottom: 0.5rem">
                 🔗 Resources
             </h3>
 
@@ -536,29 +519,41 @@
                     class="link-item"
                     style="background: rgba(0, 0, 0, 0.3); border-color: white"
                 >
-                    <strong>Demo Kit:</strong> demos.timeplus.com/#/id/cep
+                    <strong>More Details:</strong> <a href=https://demos.timeplus.com/#/id/cep>demos.timeplus.com/#/id/cep</a>
                 </div>
                 <div
                     class="link-item"
                     style="background: rgba(0, 0, 0, 0.3); border-color: white"
                 >
-                    <strong>Live App:</strong> play.demo.timeplus.com
+                    <strong>Live Demo:</strong> <a href=https://play.demo.timeplus.com/default/console/dashboard/7f66d441-23cd-4ba6-bc9d-6a73a4a07875>play.demo.timeplus.com</a>
                 </div>
                 <div
                     class="link-item"
                     style="background: rgba(0, 0, 0, 0.3); border-color: white"
                 >
-                    <strong>Blog:</strong> CEP with Streaming SQL & UDF
+                    <strong>Blog:</strong> <a href="https://www.timeplus.com/post/cep-with-streaming-sql-udf">CEP with Streaming SQL & UDF</a>
                 </div>
                 <div
                     class="link-item"
                     style="background: rgba(0, 0, 0, 0.3); border-color: white"
                 >
-                    <strong>Advanced Examples:</strong> GitHub Gist
+                    <strong>Advanced Examples:</strong> <a href="https://gist.github.com/gangtao/44fce0d019be441f94e19503c0923cf7">GitHub Gist</a>
+                </div>
+                <div
+                    class="link-item"
+                    style="background: rgba(0, 0, 0, 0.3); border-color: white"
+                >
+                    <strong>Slack:</strong> <a href="https://timeplus.com/slack">timeplus.com/slack</a>
+                </div>
+                <div
+                    class="link-item"
+                    style="background: rgba(0, 0, 0, 0.3); border-color: white"
+                >
+                    <strong>Documentation:</strong> <a href="https://docs.timeplus.com">docs.timeplus.com</a>
                 </div>
             </div>
 
-            <div class="logo">Timeplus</div>
+              <div class="logo"><img src=https://timeplus.io/Option3_W.png width="120"></div>
         </div>
     </body>
 </html>
