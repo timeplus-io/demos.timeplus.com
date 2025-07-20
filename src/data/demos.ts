@@ -692,4 +692,153 @@ limit 5;`,
     ],
     rank: 55,
   },
+  {
+    id: "cep",
+    title: "Complex Event Processing",
+    subtitle:
+      "Enable real-time analysis and detection of patterns, relationships, and trends across multiple streams of data events. ",
+    category: "Real-Time Analytics",
+    keywords: ["cep", "streaming", "pattern"],
+    coverImage: "cep_cover.png",
+    introduction: `Complex Event Processing (CEP) is a technology that enables real-time analysis and detection of patterns, relationships, and trends across multiple streams of data events. It goes beyond simple event handling by correlating events from different sources, identifying meaningful patterns, and triggering actions based on complex event combinations.
+
+&nbsp;
+
+CEP systems can detect temporal patterns such as:
+
+• sequences – "A followed by B within 10 minutes"
+
+• spatial relationships – "events occurring in the same geographic region"
+
+• statistical patterns – "more than 100 transactions per second from the same user"
+
+&nbsp;
+
+They operate on continuous data streams with low latency, making them ideal for scenarios requiring immediate responses.
+
+&nbsp;
+
+CEP is widely used in financial trading for algorithmic decision-making, in IoT systems for predictive maintenance, in cybersecurity for threat detection, and in business process monitoring for identifying bottlenecks or compliance violations.
+    `,
+    challenges: `1️⃣ **High-Velocity and Voluminous Event Streams:** In modern data ecosystems, events are generated at an unprecedented rate from a multitude of sources, such as IoT sensors, financial market tickers, and application logs. A CEP system must be capable of ingesting and processing these massive, continuous streams of data—often millions of events per second—without degradation in performance. For example, a global e-commerce platform might need to process millions of clickstream events per minute to detect fraudulent activity in real-time.
+
+2️⃣ **Temporal Complexity and Event Ordering:** CEP is fundamentally concerned with identifying patterns across sequences of events over time. In distributed systems, however, events can arrive out of order due to network latency or clock skew. The CEP engine must be able to handle out-of-order events, manage different time semantics (event time vs. processing time), and reason about complex temporal relationships (e.g., “event A occurs within 5 seconds of event B, but only if event C has not occurred in the last minute”).
+
+3️⃣ **Complex Pattern Definition and State Management:** Defining the patterns to be detected can be a significant challenge, often requiring a specialized query language or a sophisticated graphical interface to express complex temporal and logical conditions. For example, the [MATCH_RECOGNIZE](https://nightlies.apache.org/flink/flink-docs-release-2.0/docs/dev/table/sql/queries/match_recognize/) clause in Apache Flink has many [known limitations](https://nightlies.apache.org/flink/flink-docs-release-2.0/docs/dev/table/sql/queries/match_recognize/#known-limitations). Furthermore, the CEP engine must maintain the state of partially matched patterns, which can become computationally expensive and memory-intensive, especially for long-running patterns or when dealing with high-cardinality data. For instance, tracking the lifecycle of every order in a large logistics network requires maintaining state for millions of concurrent, long-lived sagas.
+
+4️⃣ **Low-Latency Processing and Deterministic Responses:** The core value proposition of CEP is its ability to provide insights and trigger actions in real-time. This imposes strict low-latency requirements on the entire processing pipeline, from event ingestion to pattern matching and response generation. For mission-critical applications, such as algorithmic trading or industrial control systems, the CEP engine must deliver deterministic, predictable performance, ensuring that patterns are detected and responses are triggered within a bounded time frame, regardless of the event volume or complexity.`,
+    solution:
+      "Timeplus significantly simplifies the implementation of Complex Event Processing (CEP) by utilizing a SQL-native interface. This approach allows developers and data analysts to leverage their existing expertise in the ubiquitous SQL to define and analyze event patterns. The platform enables the declarative capture of sophisticated temporal patterns through a rich set of windowing functions—including tumbling (fixed), hopping (sliding), and session windows with explicit start/end conditions—all integrated directly into the SQL syntax. \n\n&nbsp;\n\nFor scenarios requiring logic that extends beyond the capabilities of standard SQL, Timeplus provides robust extensibility through User-Defined Functions (UDFs). Developers can author these functions in widely-adopted languages such as Python or JavaScript, enabling the seamless integration of custom business logic, proprietary algorithms, or other complex computational tasks directly into the event processing pipeline.",
+    screenshots: [
+      {
+        desc: "Sample CEP to detect potential fraud in financial transactions",
+        src: "diagram.png",
+      },
+      {
+        desc: "CEP demo with randomly generated events",
+        src: "dashboard.png",
+      },
+      {
+        desc: "Generate 2 rand streams, union them together and apply count aggregation over sliding window",
+        src: "lineage.png",
+      },
+    ],
+    steps: [
+      "For relatively simple patterns, such as detecting whether there are large transactions within a short time period from different counties for same user account, you can create hop window to check the sum of the transaction as well as the number of locations",
+      "For highly customized patterns, you can create a materialized view with custom UDFs in JavaScript or Python to detect the patterns, with in-memory caching or state machine.",
+      "The captured signals can be sent to Apache Kafka topics, or trigger Slack/PagerDuty or any HTTP API, or call any Python library with built-in alert feature.",
+    ],
+    dataFlowMarkdown: `graph TD;
+        SA[Stream A]-->A[Materialized View with SQL or UDF based CEP detection];
+        SB[Stream B]-->A;
+        K[Kafka Topic]-->EK[Kafka External Stream]-->A;
+        A-->Alert-->Action[Kafka/HTTP/Slack/PagerDuty];
+`,
+    sqlExample: `-- CEP Rule Detect suspicious activity using hopping window (10 min window, 5 sec step)
+CREATE MATERIALIZED VIEW sql_based_cep_fraud_detection AS
+SELECT  userId, count(*) as total_events,
+        count_if(eventType = 'login') as login_count,
+        count_if(eventType = 'purchase') as purchase_count,
+        sum(amount) as total_purchase_amount,
+        group_array(location) as all_locations,
+        group_array(eventType) as event_sequence,
+        group_array(timestamp) as time_sequence,
+        window_start as t_start,
+        window_end as t_end
+FROM hop(unified_user_events, timestamp, 5s, 10m)
+GROUP BY userId, window_start, window_end
+HAVING
+  -- Multiple geographic locations
+  length(array_distinct(all_locations)) >= 2
+  -- High-value transactions
+  AND total_purchase_amount > 1000
+  -- Must have at least one purchase
+  AND purchase_count >= 1;
+
+-- JavaScript UDF-based CEP Rule Detect
+SELECT cep_simple_pattern(time, event) FROM cep_test_stream;
+
+CREATE OR REPLACE AGGREGATE FUNCTION cep_simple_pattern(time datetime64(3), event string, _tp_delta int8) RETURNS string LANGUAGE JAVASCRIPT AS $$\{
+ has_customized_emit: true,
+
+ initialize: function () {
+   this.events = [];
+   this.pattern = ['A', 'B', 'A'];
+   this.match_events = [];
+ },
+
+ process: function (Time, Event) {
+   console.log(Time, Event);
+
+   for (let i = 0; i < Event.length; i++) {
+       const event = {
+           time: Time[i],
+           event: Event[i]
+       }
+       this.events.push(event);
+
+       // a simple pattern detection
+       if (this.events.length > 3) {
+           // get last three events
+           const last_three_events = this.events.slice(-3);
+           // check if the pattern is present
+           if (last_three_events[0].event === this.pattern[0] &&
+               last_three_events[1].event === this.pattern[1] &&
+               last_three_events[2].event === this.pattern[2]) {
+               this.match = true;
+               this.match_events.push(JSON.stringify(last_three_events))
+           }
+       }
+   }
+
+   return this.match_events.length;
+ },
+
+ finalize: function () {
+   const result = this.match_events;
+   this.match_events = [];
+   return result;
+ },
+}$$;`,
+    demoLinks: [
+      {
+        title: "Live Demo in Timeplus",
+        url: "https://play.demo.timeplus.com/default/console/dashboard/7f66d441-23cd-4ba6-bc9d-6a73a4a07875",
+        icon: "timeplus_logo.svg",
+        description: "",
+      },
+      {
+        title: "📝 CEP Technical Deep Dive",
+        url: "https://www.timeplus.com/post/customer-story-zyre",
+        description: "How to Build CEP Applications with Timeplus",
+      },
+      {
+        title: "📝 Advanced CEP with state machine",
+        url: "https://gist.github.com/gangtao/44fce0d019be441f94e19503c0923cf7",
+        description:
+          "Leveraging a finite state machine (FSM) for efficient handling.",
+      },
+    ],
+    rank: 52,
+  },
 ];
