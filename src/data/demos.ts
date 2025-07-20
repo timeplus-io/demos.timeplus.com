@@ -706,7 +706,7 @@ limit 5;`,
 
 CEP systems can detect temporal patterns such as:
 
-• sequences – "A followed by B within 10 minutes"
+• sequences – "Event A followed by B then C within 10 minutes"
 
 • spatial relationships – "events occurring in the same geographic region"
 
@@ -829,7 +829,7 @@ CREATE OR REPLACE AGGREGATE FUNCTION cep_simple_pattern(time datetime64(3), even
       },
       {
         title: "📝 CEP Technical Deep Dive",
-        url: "https://www.timeplus.com/post/customer-story-zyre",
+        url: "https://www.timeplus.com/post/cep-with-streaming-sql-udf",
         description: "How to Build CEP Applications with Timeplus",
       },
       {

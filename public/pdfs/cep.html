@@ -1,0 +1,559 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Complex Event Processing Made Simple - Timeplus</title>
+        <style>
+            @import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&display=swap");
+
+            * {
+                margin: 0;
+                padding: 0;
+                box-sizing: border-box;
+            }
+
+            body {
+                font-family:
+                    "Inter",
+                    -apple-system,
+                    BlinkMacSystemFont,
+                    sans-serif;
+                background: #110f14;
+                color: #ffffff;
+                line-height: 1.6;
+            }
+
+            a {
+                color: white;
+                text-decoration: none;
+                transition: color 0.3s ease;
+            }
+
+            .page {
+                width: 100vw;
+                height: 100vh;
+                display: flex;
+                flex-direction: column;
+                justify-content: center;
+                align-items: center;
+                padding: 40px;
+                position: relative;
+                overflow: hidden;
+            }
+
+            .page-1 {
+                background: linear-gradient(
+                    135deg,
+                    #d53f8c 5.89%,
+                    #b275ff 95.06%
+                );
+            }
+
+            .page-dark {
+                background: #110f14;
+            }
+
+            .page-accent {
+                background: #19171d;
+            }
+
+            h1 {
+                font-size: clamp(2.5rem, 8vw, 4rem);
+                font-weight: 900;
+                line-height: 1.1;
+                margin-bottom: 1.5rem;
+                text-align: center;
+            }
+
+            h2 {
+                font-size: clamp(2rem, 6vw, 3rem);
+                font-weight: 700;
+                line-height: 1.2;
+                margin-bottom: 1.5rem;
+                text-align: center;
+            }
+
+            h3 {
+                font-size: clamp(1.5rem, 4vw, 2rem);
+                font-weight: 600;
+                margin-bottom: 1rem;
+                color: #b275ff;
+            }
+
+            p {
+                font-size: clamp(1.1rem, 3vw, 1.5rem);
+                margin-bottom: 1.5rem;
+                text-align: center;
+                max-width: 800px;
+            }
+
+            .emoji {
+                font-size: clamp(3rem, 8vw, 5rem);
+                margin-bottom: 1rem;
+            }
+
+            .code-block {
+                background: #2f2d32;
+                border-radius: 16px;
+                padding: 2rem;
+                margin: 2rem 0;
+                font-family: "Courier New", monospace;
+                font-size: clamp(0.9rem, 2.5vw, 1.2rem);
+                overflow-x: auto;
+                border: 1px solid #42186d;
+                max-width: 90%;
+            }
+
+            .highlight {
+                color: #b275ff;
+                font-weight: 700;
+            }
+
+            .gradient-text {
+                background: linear-gradient(135deg, #d53f8c, #b275ff);
+                -webkit-background-clip: text;
+                -webkit-text-fill-color: transparent;
+                background-clip: text;
+            }
+
+            .feature-grid {
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+                gap: 2rem;
+                width: 100%;
+                max-width: 1000px;
+                margin: 2rem 0;
+            }
+
+            .feature-card {
+                background: #2f2d32;
+                border-radius: 16px;
+                padding: 2rem;
+                text-align: center;
+                border: 1px solid #42186d;
+                transition: transform 0.3s ease;
+            }
+
+            .feature-card:hover {
+                transform: translateY(-5px);
+            }
+
+            .comparison-table {
+                width: 100%;
+                max-width: 900px;
+                margin: 2rem 0;
+            }
+
+            .comparison-row {
+                display: flex;
+                justify-content: space-between;
+                padding: 1rem;
+                border-bottom: 1px solid #2f2d32;
+                font-size: clamp(1rem, 2.5vw, 1.3rem);
+            }
+
+            .comparison-row:last-child {
+                border-bottom: none;
+            }
+
+            .logo {
+                position: absolute;
+                bottom: 30px;
+                right: 30px;
+                opacity: 0.8;
+                font-size: 1.2rem;
+                font-weight: 600;
+            }
+
+            .cta-button {
+                background: linear-gradient(135deg, #d53f8c, #b275ff);
+                color: white;
+                padding: 1.5rem 3rem;
+                border-radius: 50px;
+                font-size: clamp(1.1rem, 3vw, 1.5rem);
+                font-weight: 600;
+                text-decoration: none;
+                display: inline-block;
+                margin-top: 2rem;
+                transition: transform 0.3s ease;
+            }
+
+            .cta-button:hover {
+                transform: scale(1.05);
+            }
+
+            .pain-point {
+                background: #2f2d32;
+                border-left: 4px solid #d53f8c;
+                padding: 1.5rem;
+                margin: 1rem 0;
+                border-radius: 8px;
+                text-align: left;
+                max-width: 800px;
+            }
+
+            .success-metric {
+                font-size: clamp(2.5rem, 6vw, 4rem);
+                font-weight: 900;
+                color: #b275ff;
+                margin: 0.2rem 0;
+            }
+
+            .pattern-list {
+                text-align: left;
+                max-width: 600px;
+                margin: 0 auto;
+            }
+
+            .pattern-list p {
+                text-align: left;
+                margin-bottom: 0.8rem;
+            }
+
+            .solution-card {
+                background: #2f2d32;
+                border-radius: 16px;
+                padding: 2rem;
+                margin: 0.5rem 0;
+                width: 100%;
+                max-width: 800px;
+                border: 2px solid #42186d;
+            }
+
+            .solution-header {
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                margin-bottom: 1rem;
+            }
+
+            .solution-title {
+                font-size: clamp(1.3rem, 3vw, 1.8rem);
+                font-weight: 700;
+                color: #b275ff;
+            }
+
+            .solution-items {
+                text-align: left;
+            }
+
+            .solution-items p {
+                text-align: left;
+                font-size: clamp(1rem, 2.5vw, 1.3rem);
+                margin-bottom: 0.5rem;
+            }
+
+            .pattern-example {
+                background: #2f2d32;
+                border-radius: 12px;
+                padding: 1.5rem;
+                margin: 0.2rem 0;
+                border: 1px solid #42186d;
+            }
+
+            .pattern-example h4 {
+                color: #b275ff;
+                margin-bottom: 0.5rem;
+                font-size: clamp(1.1rem, 2.5vw, 1.4rem);
+            }
+
+            .link-item {
+                background: #2f2d32;
+                border-radius: 12px;
+                padding: 1rem 1.5rem;
+                margin: 0.8rem 0;
+                text-align: left;
+                border: 1px solid #42186d;
+                font-size: clamp(0.9rem, 2vw, 1.1rem);
+            }
+
+            .link-item strong {
+                color: #b275ff;
+            }
+
+            @media print {
+                .page {
+                    page-break-after: always;
+                }
+            }
+        </style>
+    </head>
+    <body>
+        <!-- Page 1: Hero -->
+        <div class="page page-1">
+            <div class="emoji">🚀</div>
+            <h1>Complex Event Processing (CEP)<br />Made Simple</h1>
+            <p style="font-size: clamp(1.5rem, 4vw, 2rem); font-weight: 600">
+                Write SQL. Detect Patterns. React in Real-Time.
+            </p>
+            <div
+                class="code-block"
+                style="background: rgba(0, 0, 0, 0.3); border: 2px solid white"
+            >
+                <code
+                    >SELECT userId, count(DISTINCT location) as locations,
+                    sum(amount) as total FROM hop(transactions, 5s, 10m)<br />
+                    GROUP BY window_start, userId HAVING locations > 1 AND total
+                    > 1000
+                </code>
+            </div>
+            <p style="font-size: clamp(1.2rem, 3vw, 1.6rem)">
+                <strong>That's it!</strong> No complex syntax. Just SQL.
+            </p>
+             <div class="logo"><img src=https://timeplus.io/Option3_W.png width="120"></div>
+        </div>
+
+        <!-- Page 2: What is CEP + Pain Points -->
+        <div class="page page-dark">
+            <h2>
+                What is
+                <span class="gradient-text">Complex Event Processing?</span>
+            </h2>
+            <p>
+                CEP enables real-time analysis and detection of patterns,
+                relationships, and trends across multiple streams of data
+                events.
+            </p>
+
+            <div style="margin: 1rem 0">
+                <p
+                    style="
+                        font-size: clamp(1.3rem, 3.5vw, 1.8rem);
+                        margin-bottom: 1rem;
+                    "
+                >
+                    📊 Common Patterns:
+                </p>
+                <div class="pattern-list">
+                    <p>
+                        • sequences – Event A followed by B then C within 10
+                        minutes 🔄
+                    </p>
+                    <p>
+                        • spatial relationships – 100+ transactions/second from
+                        same user ⚡
+                    </p>
+                    <p>
+                        • statistical patterns – Events in same geographic
+                        region 📍
+                    </p>
+                </div>
+            </div>
+
+            <div class="pain-point">
+                <h3 style="color: #d53f8c">
+                    😫 The Traditional Way (Flink CEP)
+                </h3>
+                <code style="font-size: 0.9rem">
+                    SELECT T.aid, T.bid, T.cid FROM MyTable MATCH_RECOGNIZE (
+                    PARTITION BY userid ORDER BY proctime MEASURES A.id AS aid,
+                    B.id AS bid, C.id AS cid PATTERN (A B C) DEFINE A AS name =
+                    'a', B AS name = 'b', C AS name = 'c' ) AS T
+                </code>
+            </div>
+            requiring a specialized query language, many known limitations
+              <div class="logo"><img src=https://timeplus.io/Option3_W.png width="120"></div>
+        </div>
+
+        <!-- Page 3: SQL Solution -->
+        <div class="page page-accent">
+            <h2>The <span class="gradient-text">Timeplus Way</span></h2>
+            <h3>✨ SQL-Based CEP, with optional JavaScript/Python code</h3>
+
+            <div class="code-block">
+                <code>
+                    CREATE MATERIALIZED VIEW fraud_detection AS<br />
+                    SELECT userId, count(DISTINCT location) as locations,<br />
+                    sum(amount) as total FROM hop(transactions, 5s, 10m) GROUP
+                    BY window_start, userId HAVING locations > 1 AND total >
+                    1000
+                </code>
+            </div>
+
+            <div class="feature-grid" style="margin-top: 3rem">
+                <div class="feature-card">
+                    <div style="font-size: 2rem; margin-bottom: 1rem">⏱️</div>
+                    <strong>Tumbling Windows</strong> <br />
+                    Fixed-size, non-overlapping time windows
+                </div>
+                <div class="feature-card">
+                    <div style="font-size: 2rem; margin-bottom: 1rem">🛝</div>
+                    <strong>Hopping Windows</strong> <br />
+                    Overlapping time windows for more frequent updates
+                </div>
+                <div class="feature-card">
+                    <div style="font-size: 2rem; margin-bottom: 1rem">🛒</div>
+                    <strong>Session Windows</strong> <br />
+                    Group events by starting/ending patterns, with inactivity
+                    gaps
+                </div>
+            </div>
+              <div class="logo"><img src=https://timeplus.io/Option3_W.png width="120"></div>
+        </div>
+
+        <!-- Page 4: JavaScript/Python UDF -->
+        <div class="page page-dark">
+            <h2>Need More? <span class="gradient-text">UDAFs !</span></h2>
+            <p>Extend SQL with User-Defined Aggregation Functions</p>
+
+            <div
+                style="
+                    display: flex;
+                    gap: 2rem;
+                    justify-content: center;
+                    margin: 2rem 0;
+                "
+            >
+                <div style="font-size: 3rem">🐍 Python</div>
+                <div style="font-size: 3rem">☕ JavaScript</div>
+            </div>
+
+            <div class="code-block">
+                <code>
+                    CREATE AGGREGATE FUNCTION detect_pattern(time datetime,
+                    event string) RETURNS string LANGUAGE JAVASCRIPT AS $${<br />
+                    &nbsp;&nbsp;// Your custom pattern logic<br />}$$;<br />
+                    SELECT detect_pattern(timestamp, event_type)<br />
+                    FROM event_stream;
+                </code>
+            </div>
+
+            <p style="margin-top: 2rem; font-size: clamp(1.2rem, 3vw, 1.6rem)">
+                🎯 <strong>Perfect for:</strong> Custom business logic,
+                proprietary algorithms, complex computations
+            </p>
+              <div class="logo"><img src=https://timeplus.io/Option3_W.png width="120"></div>
+        </div>
+
+        <!-- Page 5: Advanced State Machine -->
+        <div class="page page-accent">
+            <h2>Advanced <span class="gradient-text">CEP Patterns</span></h2>
+
+            <div class="pattern-example">
+                <h4>1️⃣ Sequence Patterns</h4>Ordered event chains (A→B→A)
+            </div>
+
+            <div class="pattern-example">
+                <h4>2️⃣ Threshold Patterns</h4>Count-based detection (≥3 A's within 5 seconds)
+            </div>
+
+            <div class="pattern-example">
+                <h4>3️⃣ Absence Patterns</h4>Negative logic (A without C occurring)
+            </div>
+
+            <div class="pattern-example">
+                <h4>4️⃣ Alternating Patterns</h4>Repeating sequences (A-B-A-B...)
+            </div>
+
+            <p style="margin-top: 2rem; font-size: clamp(1.2rem, 3vw, 1.6rem)">
+                All achievable with <strong>JavaScript/Python UDAFs</strong> 🚀
+            </p>
+              <div class="logo"><img src=https://timeplus.io/Option3_W.png width="120"></div>
+        </div>
+
+        <!-- Page 6: When to Use Each -->
+        <div class="page page-dark">
+            <h2>Choose Your <span class="gradient-text">CEP Approach</span></h2>
+
+            <div class="solution-card">
+                <div class="solution-header">
+                    <span class="solution-title">⏱️ SQL without UDAF</span>
+                    <span style="color: #164c3f; font-weight: 700">SIMPLE</span>
+                </div>
+                <div class="solution-items">
+                    <p>✅ Time-based aggregations</p>
+                    <p>✅ Count/Sum/Avg metrics</p>
+                    <p>✅ Simple thresholds</p>
+                    <p style="color: #737175; font-style: italic">
+                        Example: Fraud detection, rate limiting
+                    </p>
+                </div>
+            </div>
+
+            <div class="solution-card">
+                <div class="solution-header">
+                    <span class="solution-title"
+                        >🔧 SQL with JavaScript/Python UDAF</span
+                    >
+                    <span style="color: #d53f8c; font-weight: 700"
+                        >FLEXIBLE</span
+                    >
+                </div>
+                <div class="solution-items">
+                    <p>✅ Custom business logic</p>
+                    <p>✅ Complex conditions</p>
+                    <p>✅ External libraries</p>
+                    <p>✅ Multi-step sequences</p>
+                    <p>✅ Complex state tracking</p>
+                    <p style="color: #737175; font-style: italic">
+                        Example: ML scoring, custom algorithms, Order lifecycle,
+                        IoT monitoring
+                    </p>
+                </div>
+            </div>
+              <div class="logo"><img src=https://timeplus.io/Option3_W.png width="120"></div>
+        </div>
+
+        <!-- Page 7: Results & CTA -->
+        <div class="page page-1">
+            <h2>Ready to simplify your CEP?</h2>
+<!--
+            <div style="margin: 1rem 0">
+                <div class="success-metric">10x</div>
+                <p>Faster implementation than traditional CEP</p>
+
+                <div class="success-metric">< 100ms</div>
+                <p>Pattern detection latency</p>
+
+                <div class="success-metric">1M+</div>
+                <p>Events per second processed</p>
+            </div> -->
+
+            <h3 style="color: white; margin-top: 1rem; margin-bottom: 0.5rem">
+                🔗 Resources
+            </h3>
+
+            <div style="max-width: 800px; width: 100%">
+                <div
+                    class="link-item"
+                    style="background: rgba(0, 0, 0, 0.3); border-color: white"
+                >
+                    <strong>More Details:</strong> <a href=https://demos.timeplus.com/#/id/cep>demos.timeplus.com/#/id/cep</a>
+                </div>
+                <div
+                    class="link-item"
+                    style="background: rgba(0, 0, 0, 0.3); border-color: white"
+                >
+                    <strong>Live Demo:</strong> <a href=https://play.demo.timeplus.com/default/console/dashboard/7f66d441-23cd-4ba6-bc9d-6a73a4a07875>play.demo.timeplus.com</a>
+                </div>
+                <div
+                    class="link-item"
+                    style="background: rgba(0, 0, 0, 0.3); border-color: white"
+                >
+                    <strong>Blog:</strong> <a href="https://www.timeplus.com/post/cep-with-streaming-sql-udf">CEP with Streaming SQL & UDF</a>
+                </div>
+                <div
+                    class="link-item"
+                    style="background: rgba(0, 0, 0, 0.3); border-color: white"
+                >
+                    <strong>Advanced Examples:</strong> <a href="https://gist.github.com/gangtao/44fce0d019be441f94e19503c0923cf7">GitHub Gist</a>
+                </div>
+                <div
+                    class="link-item"
+                    style="background: rgba(0, 0, 0, 0.3); border-color: white"
+                >
+                    <strong>Slack:</strong> <a href="https://timeplus.com/slack">timeplus.com/slack</a>
+                </div>
+                <div
+                    class="link-item"
+                    style="background: rgba(0, 0, 0, 0.3); border-color: white"
+                >
+                    <strong>Documentation:</strong> <a href="https://docs.timeplus.com">docs.timeplus.com</a>
+                </div>
+            </div>
+
+              <div class="logo"><img src=https://timeplus.io/Option3_W.png width="120"></div>
+        </div>
+    </body>
+</html>
