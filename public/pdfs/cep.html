@@ -1,0 +1,453 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Complex Event Processing Made Simple - Timeplus</title>
+        <style>
+            @import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&display=swap");
+
+            * {
+                margin: 0;
+                padding: 0;
+                box-sizing: border-box;
+            }
+
+            body {
+                font-family:
+                    "Inter",
+                    -apple-system,
+                    BlinkMacSystemFont,
+                    sans-serif;
+                background: #110f14;
+                color: #ffffff;
+                line-height: 1.6;
+            }
+
+            .page {
+                width: 100vw;
+                height: 100vh;
+                display: flex;
+                flex-direction: column;
+                justify-content: center;
+                align-items: center;
+                padding: 40px;
+                position: relative;
+                overflow: hidden;
+            }
+
+            .page-1 {
+                background: linear-gradient(
+                    135deg,
+                    #d53f8c 5.89%,
+                    #b275ff 95.06%
+                );
+            }
+
+            .page-dark {
+                background: #110f14;
+            }
+
+            .page-accent {
+                background: #19171d;
+            }
+
+            h1 {
+                font-size: clamp(2.5rem, 8vw, 4rem);
+                font-weight: 900;
+                line-height: 1.1;
+                margin-bottom: 1.5rem;
+                text-align: center;
+            }
+
+            h2 {
+                font-size: clamp(2rem, 6vw, 3rem);
+                font-weight: 700;
+                line-height: 1.2;
+                margin-bottom: 1.5rem;
+                text-align: center;
+            }
+
+            h3 {
+                font-size: clamp(1.5rem, 4vw, 2rem);
+                font-weight: 600;
+                margin-bottom: 1rem;
+                color: #b275ff;
+            }
+
+            p {
+                font-size: clamp(1.1rem, 3vw, 1.5rem);
+                margin-bottom: 1.5rem;
+                text-align: center;
+                max-width: 800px;
+            }
+
+            .emoji {
+                font-size: clamp(3rem, 8vw, 5rem);
+                margin-bottom: 1rem;
+            }
+
+            .code-block {
+                background: #2f2d32;
+                border-radius: 16px;
+                padding: 2rem;
+                margin: 2rem 0;
+                font-family: "Courier New", monospace;
+                font-size: clamp(0.9rem, 2.5vw, 1.2rem);
+                overflow-x: auto;
+                border: 1px solid #42186d;
+                max-width: 90%;
+            }
+
+            .highlight {
+                color: #b275ff;
+                font-weight: 700;
+            }
+
+            .gradient-text {
+                background: linear-gradient(135deg, #d53f8c, #b275ff);
+                -webkit-background-clip: text;
+                -webkit-text-fill-color: transparent;
+                background-clip: text;
+            }
+
+            .feature-grid {
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+                gap: 2rem;
+                width: 100%;
+                max-width: 1000px;
+                margin: 2rem 0;
+            }
+
+            .feature-card {
+                background: #2f2d32;
+                border-radius: 16px;
+                padding: 2rem;
+                text-align: center;
+                border: 1px solid #42186d;
+                transition: transform 0.3s ease;
+            }
+
+            .feature-card:hover {
+                transform: translateY(-5px);
+            }
+
+            .comparison-table {
+                width: 100%;
+                max-width: 800px;
+                margin: 2rem 0;
+            }
+
+            .comparison-row {
+                display: flex;
+                justify-content: space-between;
+                padding: 1rem;
+                border-bottom: 1px solid #2f2d32;
+                font-size: clamp(1rem, 2.5vw, 1.3rem);
+            }
+
+            .comparison-row:last-child {
+                border-bottom: none;
+            }
+
+            .logo {
+                position: absolute;
+                bottom: 30px;
+                right: 30px;
+                opacity: 0.8;
+                font-size: 1.2rem;
+                font-weight: 600;
+            }
+
+            .cta-button {
+                background: linear-gradient(135deg, #d53f8c, #b275ff);
+                color: white;
+                padding: 1.5rem 3rem;
+                border-radius: 50px;
+                font-size: clamp(1.1rem, 3vw, 1.5rem);
+                font-weight: 600;
+                text-decoration: none;
+                display: inline-block;
+                margin-top: 2rem;
+                transition: transform 0.3s ease;
+            }
+
+            .cta-button:hover {
+                transform: scale(1.05);
+            }
+
+            .pain-point {
+                background: #2f2d32;
+                border-left: 4px solid #d53f8c;
+                padding: 1.5rem;
+                margin: 1rem 0;
+                border-radius: 8px;
+                text-align: left;
+                max-width: 800px;
+            }
+
+            .success-metric {
+                font-size: clamp(2.5rem, 6vw, 4rem);
+                font-weight: 900;
+                color: #b275ff;
+                margin: 1rem 0;
+            }
+
+            @media print {
+                .page {
+                    page-break-after: always;
+                }
+            }
+        </style>
+    </head>
+    <body>
+        <!-- Page 1: Hero -->
+        <div class="page page-1">
+            <div class="emoji">🚀</div>
+            <h1>Complex Event Processing<br />Made Simple</h1>
+            <p style="font-size: clamp(1.5rem, 4vw, 2rem); font-weight: 600">
+                Write SQL. Detect Patterns. React in Real-Time.
+            </p>
+            <div
+                class="code-block"
+                style="background: rgba(0, 0, 0, 0.3); border: 2px solid white"
+            >
+                <code>
+                    SELECT userId, count(*) as events<br />
+                    FROM hop(events, 5s, 10m)<br />
+                    WHERE amount > 1000<br />
+                    GROUP BY userId
+                </code>
+            </div>
+            <p style="font-size: clamp(1.2rem, 3vw, 1.6rem)">
+                <strong>That's it!</strong> No complex syntax. Just SQL.
+            </p>
+            <div class="logo">Timeplus</div>
+        </div>
+
+        <!-- Page 2: What is CEP + Pain Points -->
+        <div class="page page-dark">
+            <h2>
+                What is
+                <span class="gradient-text">Complex Event Processing?</span>
+            </h2>
+            <p>
+                CEP detects patterns across multiple data streams in real-time
+            </p>
+
+            <div style="margin: 2rem 0">
+                <p
+                    style="
+                        font-size: clamp(1.3rem, 3.5vw, 1.8rem);
+                        margin-bottom: 2rem;
+                    "
+                >
+                    📊 Common Patterns:
+                </p>
+                <div style="text-align: left; max-width: 600px">
+                    <p>• "A followed by B within 10 minutes" 🔄</p>
+                    <p>• "100+ transactions/second from same user" ⚡</p>
+                    <p>• "Events in same geographic region" 📍</p>
+                </div>
+            </div>
+
+            <div class="pain-point">
+                <h3 style="color: #d53f8c">
+                    😫 The Traditional Way (Flink CEP)
+                </h3>
+                <code style="font-size: 1rem">
+                    Pattern.&lt;Event&gt;begin("start")<br />
+                    &nbsp;&nbsp;.where(_.type == "A")<br />
+                    &nbsp;&nbsp;.followedBy("middle")<br />
+                    &nbsp;&nbsp;.where(_.type == "B")<br />
+                    &nbsp;&nbsp;.within(Time.minutes(10))
+                </code>
+            </div>
+            <div class="logo">Timeplus</div>
+        </div>
+
+        <!-- Page 3: SQL Solution -->
+        <div class="page page-accent">
+            <h2>The <span class="gradient-text">Timeplus Way</span></h2>
+            <div class="emoji">✨</div>
+            <h3>Pure SQL-Based CEP</h3>
+
+            <div class="code-block">
+                <code>
+                    -- Detect fraud: multiple locations + high value<br />
+                    CREATE MATERIALIZED VIEW fraud_detection AS<br />
+                    SELECT userId, <br />
+                    &nbsp;&nbsp;count(DISTINCT location) as locations,<br />
+                    &nbsp;&nbsp;sum(amount) as total<br />
+                    FROM hop(transactions, 5s, 10m)<br />
+                    GROUP BY userId<br />
+                    HAVING locations >= 2 AND total > 1000
+                </code>
+            </div>
+
+            <div class="feature-grid" style="margin-top: 3rem">
+                <div class="feature-card">
+                    <div style="font-size: 2rem; margin-bottom: 1rem">⏱️</div>
+                    <strong>Tumbling Windows</strong>
+                </div>
+                <div class="feature-card">
+                    <div style="font-size: 2rem; margin-bottom: 1rem">🔄</div>
+                    <strong>Hopping Windows</strong>
+                </div>
+                <div class="feature-card">
+                    <div style="font-size: 2rem; margin-bottom: 1rem">📊</div>
+                    <strong>Session Windows</strong>
+                </div>
+            </div>
+            <div class="logo">Timeplus</div>
+        </div>
+
+        <!-- Page 4: JavaScript UDF -->
+        <div class="page page-dark">
+            <h2>
+                Need More? <span class="gradient-text">JavaScript UDFs</span>
+            </h2>
+            <p>Extend SQL with custom logic for complex patterns</p>
+
+            <div class="code-block">
+                <code>
+                    -- Simple pattern matching with JS<br />
+                    CREATE FUNCTION detect_pattern(events) <br />
+                    RETURNS string LANGUAGE JAVASCRIPT AS $$<br />
+                    &nbsp;&nbsp;// Your custom logic here<br />
+                    &nbsp;&nbsp;if (events.match(['A', 'B', 'A'])) {<br />
+                    &nbsp;&nbsp;&nbsp;&nbsp;return 'Pattern detected!';<br />
+                    &nbsp;&nbsp;}<br />
+                    $$;<br /><br />
+                    SELECT detect_pattern(event_sequence) <br />
+                    FROM event_stream;
+                </code>
+            </div>
+
+            <p style="margin-top: 2rem; font-size: clamp(1.2rem, 3vw, 1.6rem)">
+                🎯 <strong>Perfect for:</strong> Custom business logic,
+                proprietary algorithms, complex computations
+            </p>
+            <div class="logo">Timeplus</div>
+        </div>
+
+        <!-- Page 5: Advanced State Machine -->
+        <div class="page page-accent">
+            <h2>
+                Advanced: <span class="gradient-text">State Machine CEP</span>
+            </h2>
+
+            <div style="text-align: center; margin: 2rem 0">
+                <div style="font-size: clamp(3rem, 8vw, 5rem)">
+                    🔄 → 📊 → ✅
+                </div>
+                <p style="margin-top: 1rem">State Transitions in Real-Time</p>
+            </div>
+
+            <div class="feature-grid">
+                <div class="feature-card">
+                    <h3 style="color: #0b66bc">In-Memory State</h3>
+                    <p>Lightning-fast pattern matching</p>
+                </div>
+                <div class="feature-card">
+                    <h3 style="color: #077d95">Complex Sequences</h3>
+                    <p>Multi-step pattern detection</p>
+                </div>
+                <div class="feature-card">
+                    <h3 style="color: #164c3f">Long-Running Patterns</h3>
+                    <p>Track patterns over hours/days</p>
+                </div>
+            </div>
+
+            <p style="margin-top: 2rem">
+                <strong>Use Case:</strong> Order lifecycle tracking, fraud
+                detection sagas, IoT device monitoring
+            </p>
+            <div class="logo">Timeplus</div>
+        </div>
+
+        <!-- Page 6: Comparison -->
+        <div class="page page-dark">
+            <h2>
+                When to Use <span class="gradient-text">Each Approach</span>
+            </h2>
+
+            <div class="comparison-table">
+                <div class="comparison-row">
+                    <strong>SQL Windows</strong>
+                    <span>✅ Simple patterns</span>
+                </div>
+                <div class="comparison-row">
+                    <strong></strong>
+                    <span>✅ Aggregations</span>
+                </div>
+                <div class="comparison-row">
+                    <strong></strong>
+                    <span>✅ Time-based logic</span>
+                </div>
+
+                <div class="comparison-row" style="margin-top: 2rem">
+                    <strong>JavaScript UDF</strong>
+                    <span>✅ Custom logic</span>
+                </div>
+                <div class="comparison-row">
+                    <strong></strong>
+                    <span>✅ Complex conditions</span>
+                </div>
+                <div class="comparison-row">
+                    <strong></strong>
+                    <span>✅ Business rules</span>
+                </div>
+
+                <div class="comparison-row" style="margin-top: 2rem">
+                    <strong>State Machine</strong>
+                    <span>✅ Multi-step patterns</span>
+                </div>
+                <div class="comparison-row">
+                    <strong></strong>
+                    <span>✅ Long sequences</span>
+                </div>
+                <div class="comparison-row">
+                    <strong></strong>
+                    <span>✅ Stateful tracking</span>
+                </div>
+            </div>
+            <div class="logo">Timeplus</div>
+        </div>
+
+        <!-- Page 7: Results & CTA -->
+        <div class="page page-1">
+            <h2>Real Results with Timeplus</h2>
+
+            <div style="margin: 2rem 0">
+                <div class="success-metric">10x</div>
+                <p>Faster implementation than traditional CEP</p>
+
+                <div class="success-metric">< 100ms</div>
+                <p>Pattern detection latency</p>
+
+                <div class="success-metric">1M+</div>
+                <p>Events per second processed</p>
+            </div>
+
+            <h3 style="color: white; margin-top: 3rem">
+                Ready to simplify your CEP?
+            </h3>
+
+            <div style="margin-top: 2rem">
+                <p style="font-size: 1.3rem">
+                    🎯 Try Live Demo<br />
+                    💬 Join our Slack Community<br />
+                    📚 Read the Docs
+                </p>
+            </div>
+
+            <p style="margin-top: 3rem; font-size: 1.5rem; font-weight: 700">
+                demos.timeplus.com/#/id/cep
+            </p>
+
+            <div class="logo">Timeplus</div>
+        </div>
+    </body>
+</html>
