@@ -205,15 +205,15 @@ replace_regex(sm:scope.name,'.*scraper/(.*)','\\1') as scope_name
 from o11y.otlp_metrics where scope_name='loadscraper' and metrics_desc='Average CPU Load over 1 minute.' settings seek_to='-1h'
 );
 
-create external stream sink.splunk_t1 (event string)
+create external stream o11y.splunk_t1 (raw string)
 settings
 type = 'http',
 data_format = 'JSONEachRow',
 http_header_Authorization='Splunk 8367dcdd-..1bb',
 url = 'http://hec.splunk.demo.timeplus.com:8088/services/collector/event';
 
-create materialized view o11y.mv_otel_kafka2splunk into sink.splunk_t1
-as select raw as event from o11y.otlp_metrics;
+create materialized view o11y.mv_otel_kafka2splunk into o11y.splunk_t1
+as select raw from o11y.otlp_metrics;
     `,
     demoLinks: [
       {
