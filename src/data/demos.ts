@@ -242,10 +242,10 @@ as select raw from o11y.otlp_metrics;
       },
       {
         title: "Live Data in OpenSearch",
-        url: "http://opensearch.demo.timeplus.com:5601/app/dev_tools#/console",
+        url: "http://35.203.129.98:5601/app/data-explorer/discover",
         icon: "opensearch_mark_default.svg",
         description:
-          "Login with demo/de1237!Mo, run the default query to match all events",
+          "",
       },
     ],
     rank: 20,
