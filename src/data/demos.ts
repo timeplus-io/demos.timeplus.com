@@ -313,9 +313,9 @@ AND to_time(c.time) >= to_time(b.time);
     demoLinks: [
       {
         title: "Live Demo in Timeplus",
-        url: "https://demo.timeplus.cloud/ksql-alt/console/",
+        url: "https://timeplus.demo.timeplus.com/default/console",
         icon: "timeplus_logo.svg",
-        description: "Login with SSO, choose ksql demo workspace",
+        description: "Login with demo:demo123",
       },
       {
         title: "Kafka UI",
@@ -404,14 +404,14 @@ inner join dim_code_to_status using (code);`,
       },
       {
         title: "Live Demo in Timeplus",
-        url: "https://demo.timeplus.cloud/sp/console/",
+        url: "https://timeplus.demo.timeplus.com/default/console",
         icon: "timeplus_logo.svg",
         description:
-          "Login with SSO, choose 'Stream Processing' demo workspace",
+          "Login with user demo:demo123",
       },
       {
         title: "ClickHouse UI",
-        url: "http://clickhouse.demo.timeplus.com:8123/play?password=demo123&user=demo#c2VsZWN0ICogZnJvbSBkZW1vLmh0dHBfY29kZV9jb3VudF81cyBvcmRlciBieSB0cyBkZXNjIGxpbWl0IDM=",
+        url: "http://34.169.40.46:8123/play?user=demo#c2VsZWN0ICogZnJvbSBkZW1vLmh0dHBfY29kZV9jb3VudF81cyBvcmRlciBieSB0cyBkZXNjIGxpbWl0IDM=",
         icon: "clickhouse_logo_square_120.png",
         description: "Query the tables in ClickHouse",
       },
@@ -584,9 +584,9 @@ FROM returns
     demoLinks: [
       {
         title: "Live Demo in Timeplus",
-        url: "https://play.demo.timeplus.com/default/console/dashboard/e4436486-0503-4265-93b8-300354ea6568",
+        url: "https://timeplus.demo.timeplus.com/default/console/dashboard/dc9fe3d9-9e3c-437f-bb60-596d192318a9",
         icon: "timeplus_logo.svg",
-        description: "",
+        description: "Login with user demo:demo123",
       },
       {
         title: "📝 Customer Story",
@@ -670,9 +670,9 @@ limit 5;`,
       },
       {
         title: "Live Demo in Timeplus",
-        url: "https://play.demo.timeplus.com/default/console/dashboard/7b553ed7-c29f-49ee-aa6c-ac95e371059c",
+        url: "https://timeplus.demo.timeplus.com/default/console/dashboard/6802f3fa-a5e3-4722-8d40-c66b72b4f333",
         icon: "timeplus_logo.svg",
-        description: "",
+        description: "Login with user demo:demo123",
       },
       {
         title: "🐍 Python Notebook",
@@ -823,9 +823,9 @@ CREATE OR REPLACE AGGREGATE FUNCTION cep_simple_pattern(time datetime64(3), even
     demoLinks: [
       {
         title: "Live Demo in Timeplus",
-        url: "https://play.demo.timeplus.com/default/console/dashboard/7f66d441-23cd-4ba6-bc9d-6a73a4a07875",
+        url: "https://timeplus.demo.timeplus.com/default/console/dashboard/c4a358e5-fac5-43fb-afce-1f7ddf53f287",
         icon: "timeplus_logo.svg",
-        description: "",
+        description: "Login with user demo:demo123",
       },
       {
         title: "📝 CEP Technical Deep Dive",
