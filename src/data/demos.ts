@@ -25,6 +25,133 @@ export interface Demo {
 
 export const demos: Demo[] = [
   {
+    id: "featurepipeline",
+    title: "Real-Time AI/ML Feature Pipeline",
+    subtitle:
+      "High-Cardinality Real-Time ML: Processing 100M Unique Keys in Under 4 Milliseconds",
+    category: "Real-Time Analytics",
+    keywords: ["AI", "machine learning", "feature engnieering", "pipeline"],
+    coverImage: "ml_feature_pipeline.png",
+    introduction: `This demo explores the implementation of a real-time machine learning feature pipeline for modern gaming platforms, where decisions must be made in milliseconds rather than hours. It presents a production case studye, a battle royale game with 10M+ daily active users processing thousands of events per second. The demo shows how Timeplus enables gaming companies to build sophisticated ML systems that can detect fraud, prevent churn, and personalize experiences in real-time.`,
+    challenges: `### Complexity of Feature Engineering and Pipeline Architecture
+- Train-predict inconsistency: Maintaining consistency between offline training and online serving while processing high-velocity data streams
+- Data preprocessing at scale: Multiple bottlenecks including late-arriving data disruption, sophisticated watermark management, and state handling that causes memory issues
+- Pipeline fragmentation: Teams end up with "patchworks" of stream processing systems that are difficult to monitor and prone to data loss, duplication, and skew
+
+### Feature Freshness
+- The critical time gap between when new data becomes available and when it can be used by a model for prediction
+- Transforming live data into actionable features**: Data source complexity, processing unpredictability, and pipeline fragmentation
+- Reducing end-to-end latency: Data ingestion delays, processing bottlenecks, state management complexity, and infrastructure limitations
+- LinkedIn research shows that feature staleness by just one hour degrades job recommendation model performance by 3.5%
+
+### Integration of Streaming and Batch Processing Systems
+- Point-in-time correctness: Requires sophisticated temporal join algorithms to ensure training datasets don't contain future information
+- System complexity: Traditional solutions like Airbnb's Chronon framework require maintaining multiple systems (Kafka, Spark Streaming, Hive) running together
+- Lambda Architecture problem: Maintaining separate batch and streaming pipelines that often produce inconsistent results and diverge over time`,
+    solution: `
+### SQL-Based Real-time Feature Computation
+Build and update multiple feature types efficiently, e.g. temporal window aggregations, event-based sequences, and cumulative lifetime metrics, all in SQL
+### Low Latency and High-Cardinality
+<4ms end-to-end latency with 100M unique keys, supporting high-cardinality streaming joins and multi-stream aggregations for sub-second ML decisions.
+### Seamless Historical Backfill from S3
+Eliminates the cold start problem or feature recomputation by enabling historical backfill from S3, allowing instant bootstrapping of cumulative features and historical context, no batch or Lambda, any other complicated stacks.
+`,
+    screenshots: [
+      { desc: "Feature Pipeline Overview",  src: "ml_feature_pipeline_screen.png" },
+    ],
+    steps: [],
+    dataFlowImage: "ml_feature_pipeline_screen.png",
+    sqlExample: `-- temporal window features
+
+-- It uses tumbling windows of 5 minutes to aggregate player actions.   
+CREATE STREAM game.player_features_5m
+(
+  user_id string,
+  ts datetime64(3, 'UTC'),
+  te datetime64(3, 'UTC'),
+  events_5m uint64,
+  matches_started_5m uint64,
+  matches_completed_5m uint64,
+  avg_kills_5m float64,
+  max_damage_5m float32,
+  unique_matches_5m uint64
+);
+
+
+CREATE MATERIALIZED VIEW game.mv_player_features_5m
+INTO game.player_features_5m
+AS
+SELECT 
+    user_id,
+    window_start as ts,
+    window_end as te,
+    count(*) as events_5m,
+    count() FILTER(WHERE event_type = 'match_start') as matches_started_5m,
+    count() FILTER(WHERE event_type = 'match_end') as matches_completed_5m,
+    avg(event_data:kills::float) as avg_kills_5m,
+    max(event_data:damage_dealt::float) as max_damage_5m,
+    count_distinct(match_id) as unique_matches_5m
+FROM tumble(game.player_actions, 5m)
+WHERE _tp_time > earliest_ts()
+GROUP BY user_id, window_start, window_end;
+
+-- accumulative features
+-- total first, and lastgame played, 
+CREATE STREAM game.user_game_stats_feature
+(
+  user_id string,
+  total_game_played uint64,
+  first_game_played string,
+  last_game_played string
+);
+
+CREATE MATERIALIZED VIEW game.mv_user_game_stats_feature
+INTO game.user_game_stats_feature
+AS
+SELECT
+  user_id, 
+  count_distinct(match_id) AS total_game_played,
+  earliest(match_id) AS first_game_played,
+  latest(match_id) AS last_game_played
+FROM
+  game.player_actions
+WHERE
+  event_type = 'match_start' and _tp_time > earliest_ts()
+GROUP BY
+  user_id
+settings seek_to = 'earliest';
+
+-- record/event based features
+-- total spend in last 10 transactions
+CREATE STREAM game.total_spend_last_10_transaction
+(
+  user_id string,
+  total_spend float64
+);
+
+CREATE MATERIALIZED VIEW game.mv_total_spend_last_10_transaction
+INTO game.total_spend_last_10_transaction
+AS
+select 
+    user_id, 
+    array_sum(x->x, group_array_last (amount_usd, 10)) as total_spend
+from game.transactions
+group by user_id;
+`,
+    youtubeVideoLink:
+      "https://www.youtube.com/embed/r3Q2YmE0-u4?si=Q_Rb14uZGDb1ylFz",
+    demoLinks: [
+      {
+        title: "Timeplus Enterprise",
+        url: "https://timeplus.demo.timeplus.com",
+        icon: "timeplus_logo.svg",
+        description:
+          "Login with demo/demo123. Check data lineage for game namespace",
+      }
+    ],
+    rank: 1,
+  },
+  {
     id: "cdc",
     title: "OLTP to OLAP",
     subtitle:
