@@ -351,7 +351,7 @@ as select raw from o11y.otlp_metrics;
       },
       {
         title: "Live Dashboard in Timeplus",
-        url: "https://timeplus.demo.timeplus.com/default/console/dashboard/f38e1645-ea15-4f10-aa69-85f55440ff55",
+        url: "https://timeplus.demo.timeplus.com/default/console/dashboard/6f2c94e2-e2b7-4ec0-b8f9-a32133db413e",
         icon: "timeplus_logo.svg",
         description: "Login with demo/demo123",
       },
@@ -363,9 +363,9 @@ as select raw from o11y.otlp_metrics;
       },
       {
         title: "Live Data in Splunk",
-        url: "https://splunk.demo.timeplus.com/en-US/app/search/search?q=search%20index%3D%22test1%22%20sourcetype%3D_json",
+        url: "https://splunk.demo.timeplus.com/en-US/app/search/search?q=search%20index%3D%22otel%22",
         icon: "splunk_github.jpeg",
-        description: "Login with demo/demo1234",
+        description: "",
       },
       {
         title: "Live Data in OpenSearch",
