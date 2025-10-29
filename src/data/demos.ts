@@ -139,7 +139,7 @@ from game.transactions
 group by user_id;
 `,
     youtubeVideoLink:
-      "https://www.youtube.com/embed/r3Q2YmE0-u4?si=Q_Rb14uZGDb1ylFz",
+      "https://www.youtube.com/embed/u92KzjbBgoY?si=mVS4wNL0xFPW_4Pu",
     demoLinks: [
       {
         title: "Timeplus Enterprise",
@@ -534,7 +534,7 @@ inner join dim_code_to_status using (code);`,
         url: "https://timeplus.demo.timeplus.com/default/console",
         icon: "timeplus_logo.svg",
         description:
-          "Login with user demo:demo123",
+          "Login with user demo:demo123. And open data lineage page with database stream_processing",
       },
       {
         title: "ClickHouse UI",
