@@ -1,0 +1,5 @@
+# demos.timeplus.com is a static page served straight from docs/.
+# No build step: docs/index.html fetches the Timeplus apps registry at runtime.
+[build]
+  publish = "docs"
+  command = ""
